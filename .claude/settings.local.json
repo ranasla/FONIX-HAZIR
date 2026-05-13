@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm --version)",
+      "Bash(netstat -ano)",
+      "Bash(awk '{print $5}')",
+      "Bash(cmd /c \"taskkill /PID 9528 /F 2>&1\")",
+      "Bash(python -c \"import subprocess; subprocess.run\\(['taskkill', '/PID', '9528', '/F'], capture_output=True\\); print\\('done'\\)\")",
+      "Bash(curl -s -X POST http://localhost:5000/api/auth/google-simulate -H \"Content-Type: application/json\" -d '{\"email\":\"test@gmail.com\",\"name\":\"Test User\"}')",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(d.get\\('message','ERROR:',\\), d.get\\('error',''\\)\\)\")"
+    ]
+  }
+}

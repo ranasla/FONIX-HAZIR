@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FONIX — Kayıt Ol</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%);
+            color: #f5f5ff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 420px;
+            padding: 20px;
+        }
+
+        .card {
+            background: rgba(30, 30, 50, 0.6);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 40px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .logo {
+            text-align: center;
+            font-weight: 900;
+            font-size: 32px;
+            letter-spacing: 4px;
+            margin-bottom: 10px;
+        }
+        
+        .logo .f { color: #4AADE8; }
+        .logo .on { color: #ffffff; text-shadow: 0 0 2px rgba(0,0,0,0.3); }
+        .logo .ix { color: #E63946; }
+
+        h2 {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+
+        p.sub {
+            text-align: center;
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 30px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            margin-bottom: 8px;
+            color: #ccc;
+            font-weight: 500;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        input[type="email"] {
+            width: 100%;
+            padding: 14px 18px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.3);
+            color: #fff;
+            margin-bottom: 20px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus,
+        input[type="email"]:focus {
+            outline: none;
+            border-color: #ff7ab8;
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        input[type="submit"] {
+            width: 100%;
+            padding: 16px;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+            color: #fff;
+            font-weight: 700;
+            font-size: 16px;
+            margin-top: 10px;
+            transition: all 0.3s;
+        }
+
+        input[type="submit"]:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 30px rgba(155, 89, 182, 0.3);
+        }
+
+        .error {
+            background: rgba(231, 76, 60, 0.2);
+            color: #ff6b6b;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            text-align: center;
+        }
+
+        .footer {
+            margin-top: 24px;
+            text-align: center;
+            font-size: 14px;
+            color: #888;
+        }
+
+        .footer a {
+            color: #9b59b6;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+        .footer a:hover {
+            color: #8e44ad;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            font-size: 13px;
+            opacity: 0.6;
+            transition: opacity 0.3s;
+            color: #888;
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            opacity: 1;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="card">
+            <div class="logo"><span class="f">F</span><span class="on">ON</span><span class="ix">IX</span></div>
+            <h2>Aramıza Katıl</h2>
+            <p class="sub">Kendi müziğini keşfetmeye başla.</p>
+
+            {% if error %}
+            <div class="error">{{ error }}</div>
+            {% endif %}
+
+            <form method="post">
+                <label>Kullanıcı adı</label>
+                <input type="text" name="username" placeholder="Kullanıcı adın" required>
+
+                <label>E-posta</label>
+                <input type="email" name="email" placeholder="ornek@mail.com" required>
+
+                <label>Şifre</label>
+                <input type="password" name="password" placeholder="••••••••" required>
+
+                <label>Şifre (tekrar)</label>
+                <input type="password" name="confirm" placeholder="••••••••" required>
+
+                <input type="submit" value="Kayıt Ol">
+            </form>
+
+            <div class="footer">
+                Zaten hesabın var mı? <a href="{{ url_for('login') }}">Giriş Yap</a>
+            </div>
+
+            <a href="{{ url_for('index') }}" class="back-link">← Anasayfaya Dön</a>
+        </div>
+    </div>
+
+</body>
+
+</html>

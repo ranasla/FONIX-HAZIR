@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FONIX – Profil</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%);
+            color: #f5f5ff;
+            min-height: 100vh;
+        }
+
+        .floating-notes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .note {
+            position: absolute;
+            font-size: 24px;
+            opacity: 0.08;
+            animation: floatNote linear infinite;
+        }
+
+        @keyframes floatNote {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.1; }
+            90% { opacity: 0.1; }
+            100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+        }
+
+        a { color: inherit; text-decoration: none; }
+
+        header {
+            height: 70px;
+            background: rgba(255, 20, 106, 0.95);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-family: 'Times New Roman', Georgia, serif;
+            font-size: 32px;
+            font-weight: bold;
+            text-decoration: none;
+            background: white;
+            padding: 6px 14px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .logo .f { color: #4AADE8; }
+        .logo .on { color: #ffffff; text-shadow: 0 0 2px rgba(0,0,0,0.3); }
+        .logo .ix { color: #E63946; }
+
+        .nav-links {
+            display: flex;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .nav-links a {
+            opacity: 0.9;
+            transition: all 0.3s;
+            padding: 10px 16px;
+            border-radius: 10px;
+        }
+
+        .nav-links a:hover {
+            opacity: 1;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Profile Header */
+        .profile-header {
+            background: rgba(30, 30, 50, 0.6);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 40px;
+            display: flex;
+            gap: 40px;
+            margin-bottom: 30px;
+        }
+
+        .profile-avatar {
+            width: 150px;
+            height: 150px;
+            background: linear-gradient(135deg, #ff146a, #9b59b6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            flex-shrink: 0;
+        }
+
+        .profile-info {
+            flex: 1;
+        }
+
+        .profile-info h1 {
+            font-size: 36px;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #fff 0%, #ff7ab8 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .profile-info .email {
+            color: #888;
+            margin-bottom: 20px;
+        }
+
+        .profile-stats {
+            display: flex;
+            gap: 30px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 16px 24px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 16px;
+        }
+
+        .stat-item .number {
+            font-size: 32px;
+            font-weight: 800;
+            color: #ff146a;
+        }
+
+        .stat-item .label {
+            font-size: 13px;
+            color: #888;
+            margin-top: 4px;
+        }
+
+        .profile-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ff146a, #ff7ab8);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 30px rgba(255, 20, 106, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: #888;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tab-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .tab-btn.active {
+            background: rgba(255, 20, 106, 0.2);
+            border-color: #ff146a;
+            color: #fff;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Projects Grid */
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .project-card {
+            background: rgba(30, 30, 50, 0.6);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 24px;
+            transition: all 0.3s;
+        }
+
+        .project-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(255, 20, 106, 0.3);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .project-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+
+        .project-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .project-title {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .project-date {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .project-preview {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 14px;
+            font-size: 13px;
+            color: #888;
+            line-height: 1.6;
+            max-height: 80px;
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+
+        .project-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
+        .tag {
+            padding: 6px 12px;
+            background: rgba(155, 89, 182, 0.15);
+            border-radius: 20px;
+            font-size: 11px;
+            color: #b39ddb;
+        }
+
+        .project-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .project-actions button {
+            flex: 1;
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+        }
+
+        .edit-btn {
+            background: rgba(255, 122, 184, 0.2);
+            color: #ff7ab8;
+        }
+
+        .edit-btn:hover {
+            background: rgba(255, 122, 184, 0.3);
+        }
+
+        .delete-btn {
+            background: rgba(220, 53, 69, 0.15);
+            color: #ff6b7a;
+        }
+
+        .delete-btn:hover {
+            background: rgba(220, 53, 69, 0.25);
+        }
+
+        /* Playlist Items */
+        .playlist-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .beat-card {
+            background: rgba(30, 30, 50, 0.6);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .beat-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(255, 20, 106, 0.3);
+        }
+
+        .beat-cover {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin: 0 auto 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+        }
+
+        .beat-card h4 {
+            font-size: 16px;
+            margin-bottom: 6px;
+        }
+
+        .beat-card p {
+            font-size: 13px;
+            color: #888;
+            margin-bottom: 16px;
+        }
+
+        .remove-btn {
+            padding: 8px 16px;
+            background: rgba(220, 53, 69, 0.15);
+            border: 1px solid rgba(220, 53, 69, 0.3);
+            border-radius: 20px;
+            color: #ff6b7a;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .remove-btn:hover {
+            background: rgba(220, 53, 69, 0.25);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-state .icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        .empty-state h3 {
+            color: #888;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        /* Settings Panel */
+        .settings-panel {
+            background: rgba(30, 30, 50, 0.6);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 30px;
+        }
+
+        .settings-section {
+            margin-bottom: 30px;
+        }
+
+        .settings-section h3 {
+            font-size: 18px;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            color: #888;
+            margin-bottom: 8px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px 18px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 15px;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: rgba(255, 122, 184, 0.5);
+        }
+
+        @media (max-width: 768px) {
+            .profile-header {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+
+            .profile-stats {
+                justify-content: center;
+            }
+
+            .profile-actions {
+                justify-content: center;
+            }
+
+            .tabs {
+                flex-wrap: wrap;
+            }
+
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="floating-notes" id="floatingNotes"></div>
+
+    <header>
+        <a href="{{ url_for('index') }}" class="logo"><span class="f">F</span><span class="on">ON</span><span class="ix">IX</span></a>
+        <div class="nav-links">
+            <a href="{{ url_for('index') }}">🏠 Keşfet</a>
+            <a href="{{ url_for('beats_page') }}">🎹 Beatler</a>
+            <a href="{{ url_for('studio') }}">🎙️ Stüdyo</a>
+            <a href="{{ url_for('lyrics_page') }}">✍️ Söz Yaz</a>
+            <a href="{{ url_for('top_page') }}">🏆 Top 10</a>
+            {% if current_user %}
+            <a href="{{ url_for('profile') }}">👤 {{ current_user }}</a>
+            <a href="{{ url_for('logout') }}">🚪 Çıkış</a>
+            {% else %}
+            <a href="{{ url_for('login') }}">🔐 Giriş</a>
+            {% endif %}
+        </div>
+    </header>
+
+    <main>
+        <!-- Profile Header -->
+        <div class="profile-header">
+            <div class="profile-avatar">
+                {{ user.username[0].upper() if user else '?' }}
+            </div>
+            <div class="profile-info">
+                <h1>{{ user.username if user else 'Kullanıcı' }}</h1>
+                <p class="email">{{ user.email if user else 'email@example.com' }}</p>
+
+                <div class="profile-stats">
+                    <div class="stat-item">
+                        <div class="number">{{ projects|length }}</div>
+                        <div class="label">Proje</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="number">{{ playlist|length }}</div>
+                        <div class="label">Playlist</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="number">{{ songs_count if songs_count else 0 }}</div>
+                        <div class="label">Şarkı</div>
+                    </div>
+                </div>
+
+                <div class="profile-actions">
+                    <a href="{{ url_for('lyrics_page') }}" class="btn btn-primary">✍️ Yeni Proje</a>
+                    <button class="btn btn-secondary" onclick="showTab('settings')">⚙️ Ayarlar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="showTab('projects')">📝 Projelerim</button>
+            <button class="tab-btn" onclick="showTab('playlist')">🎵 Playlistim</button>
+            <button class="tab-btn" onclick="showTab('settings')">⚙️ Ayarlar</button>
+        </div>
+
+        <!-- Projects Tab -->
+        <div class="tab-content active" id="projects-tab">
+            <div class="section-title">
+                <span>📝 Tüm Projelerim</span>
+                <a href="{{ url_for('lyrics_page') }}" class="btn btn-primary" style="padding: 10px 18px; font-size: 13px;">+ Yeni Proje</a>
+            </div>
+
+            {% if projects %}
+            <div class="projects-grid">
+                {% for project in projects %}
+                <div class="project-card">
+                    <div class="project-header">
+                        <div class="project-icon" style="background: linear-gradient(135deg, #ff146a, #9b59b6);">
+                            📝
+                        </div>
+                        <div>
+                            <div class="project-title">{{ project.title }}</div>
+                            <div class="project-date">{{ project.created_at.strftime('%d.%m.%Y') if project.created_at else 'Tarih yok' }}</div>
+                        </div>
+                    </div>
+                    <div class="project-preview">
+                        {{ project.lyrics[:150] + '...' if project.lyrics|length > 150 else project.lyrics }}
+                    </div>
+                    <div class="project-tags">
+                        {% if project.mood %}<span class="tag">{{ project.mood }}</span>{% endif %}
+                        {% if project.genre %}<span class="tag">{{ project.genre }}</span>{% endif %}
+                    </div>
+                    <div class="project-actions">
+                        <a href="{{ url_for('lyrics_page') }}?project_id={{ project.id }}" class="edit-btn" style="text-align: center; display: block;">✏️ Düzenle</a>
+                        <button class="delete-btn" onclick="deleteProject({{ project.id }})">🗑️ Sil</button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <div class="icon">📝</div>
+                <h3>Henüz proje yok</h3>
+                <p>İlk şarkı sözü projenizi oluşturun!</p>
+                <a href="{{ url_for('lyrics_page') }}" class="btn btn-primary">✍️ Söz Yazmaya Başla</a>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Playlist Tab -->
+        <div class="tab-content" id="playlist-tab">
+            <div class="section-title">
+                <span>🎵 Favori Beatlerim</span>
+                <a href="{{ url_for('beats_page') }}" class="btn btn-secondary" style="padding: 10px 18px; font-size: 13px;">🎹 Beatlere Git</a>
+            </div>
+
+            {% if playlist %}
+            <div class="playlist-grid">
+                {% for item in playlist %}
+                <div class="beat-card" id="playlist-item-{{ item.beat.id }}">
+                    <div class="beat-cover" style="background: {{ item.beat.cover_color if item.beat.cover_color else 'linear-gradient(135deg, #ff146a, #9b59b6)' }};">
+                        🎵
+                    </div>
+                    <h4>{{ item.beat.name }}</h4>
+                    <p>{{ item.beat.artist }} • {{ item.beat.genre }}</p>
+                    <button class="remove-btn" onclick="removeFromPlaylist({{ item.beat.id }})">
+                        ❌ Kaldır
+                    </button>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <div class="icon">🎵</div>
+                <h3>Playlist boş</h3>
+                <p>Beat kütüphanesinden favorilerinizi ekleyin!</p>
+                <a href="{{ url_for('beats_page') }}" class="btn btn-primary">🎹 Beatlere Git</a>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Settings Tab -->
+        <div class="tab-content" id="settings-tab">
+            <div class="settings-panel">
+                <div class="settings-section">
+                    <h3>👤 Profil Bilgileri</h3>
+                    <form method="POST" action="{{ url_for('profile') }}">
+                        <input type="hidden" name="action" value="update_profile">
+                        <div class="form-group">
+                            <label>Kullanıcı Adı</label>
+                            <input type="text" name="username" value="{{ user.username if user else '' }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>E-posta</label>
+                            <input type="email" name="email" value="{{ user.email if user else '' }}" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">💾 Kaydet</button>
+                    </form>
+                </div>
+
+                <div class="settings-section">
+                    <h3>🔐 Şifre Değiştir</h3>
+                    <form method="POST" action="{{ url_for('profile') }}">
+                        <input type="hidden" name="action" value="change_password">
+                        <div class="form-group">
+                            <label>Mevcut Şifre</label>
+                            <input type="password" name="current_password" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Yeni Şifre</label>
+                            <input type="password" name="new_password" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Yeni Şifre (Tekrar)</label>
+                            <input type="password" name="confirm_password" required>
+                        </div>
+                        <button type="submit" class="btn btn-secondary">🔒 Şifreyi Güncelle</button>
+                    </form>
+                </div>
+
+                <div class="settings-section">
+                    <h3>⚠️ Tehlikeli Bölge</h3>
+                    <p style="color: #888; margin-bottom: 16px;">Bu işlem geri alınamaz!</p>
+                    <button class="btn" style="background: rgba(220, 53, 69, 0.2); color: #ff6b7a;" onclick="if(confirm('Hesabınızı silmek istediğinizden emin misiniz?')) location.href='/delete-account'">
+                        🗑️ Hesabı Sil
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function showTab(tab) {
+            // Hide all
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+
+            // Show selected
+            document.getElementById(tab + '-tab').classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function deleteProject(projectId) {
+            if (!confirm('Bu projeyi silmek istediğinizden emin misiniz?')) return;
+
+            fetch('/api/project/delete', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ project_id: projectId })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Hata: ' + data.error);
+                }
+            });
+        }
+
+        function removeFromPlaylist(beatId) {
+            fetch('/api/playlist/remove', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ beat_id: beatId })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('playlist-item-' + beatId).remove();
+                } else {
+                    alert('Hata: ' + data.error);
+                }
+            });
+        }
+
+        // Floating notes
+        const notes = ['♪', '♫', '♬', '🎵', '🎶'];
+        const container = document.getElementById('floatingNotes');
+
+        function createNote() {
+            const note = document.createElement('div');
+            note.className = 'note';
+            note.textContent = notes[Math.floor(Math.random() * notes.length)];
+            note.style.left = Math.random() * 100 + '%';
+            note.style.animationDuration = (15 + Math.random() * 20) + 's';
+            container.appendChild(note);
+            setTimeout(() => note.remove(), 35000);
+        }
+
+        for (let i = 0; i < 10; i++) setTimeout(createNote, i * 400);
+        setInterval(createNote, 2500);
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%);
+            color: #f5f5ff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Kayan Notalar */
+        .floating-notes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .note {
+            position: absolute;
+            font-size: 24px;
+            opacity: 0.08;
+            animation: floatNote linear infinite;
+        }
+
+        @keyframes floatNote {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.1;
+            }
+            90% {
+                opacity: 0.1;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        /* Login Container */
+        .login-container {
+            width: 100%;
+            max-width: 520px;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .login-card {
+            background: rgba(30, 30, 50, 0.8);
+            border-radius: 28px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 56px 48px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5);
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .logo-text {
+            font-family: 'Times New Roman', Georgia, serif;
+            font-size: 56px;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 16px;
+        }
+
+        .logo-text .f { color: #4AADE8; }
+        .logo-text .on { color: #1a1a2e; text-shadow: none; }
+        .logo-text .ix { color: #E63946; }
+
+        .logo p {
+            color: #888;
+            font-size: 14px;
+            margin-top: 8px;
+        }
+
+        .login-card h2 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .login-card .subtitle {
+            color: #888;
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #ccc;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 18px 22px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            color: #fff;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: rgba(255, 122, 184, 0.5);
+            box-shadow: 0 0 20px rgba(255, 122, 184, 0.1);
+        }
+
+        .form-group input::placeholder {
+            color: #555;
+        }
+
+        .remember-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            font-size: 13px;
+        }
+
+        .remember-row label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            color: #888;
+        }
+
+        .remember-row input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: #ff146a;
+        }
+
+        .remember-row a {
+            color: #ff7ab8;
+        }
+
+        .remember-row a:hover {
+            text-decoration: underline;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 18px;
+            border-radius: 14px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ff146a, #ff7ab8);
+            color: #fff;
+            box-shadow: 0 8px 30px rgba(255, 20, 106, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(255, 20, 106, 0.4);
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 28px 0;
+            color: #555;
+            font-size: 13px;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .divider span {
+            padding: 0 16px;
+        }
+
+        .social-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .social-btn {
+            flex: 1;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .social-btn svg {
+            flex-shrink: 0;
+        }
+
+        .social-btn span {
+            font-weight: 500;
+        }
+
+        .social-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .social-btn.google:hover {
+            border-color: #4285F4;
+            box-shadow: 0 4px 15px rgba(66, 133, 244, 0.3);
+        }
+
+        .social-btn.apple:hover {
+            border-color: #fff;
+            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
+        }
+
+        .social-btn.spotify:hover {
+            border-color: #1DB954;
+            box-shadow: 0 4px 15px rgba(29, 185, 84, 0.3);
+        }
+
+        .signup-link {
+            text-align: center;
+            margin-top: 28px;
+            font-size: 14px;
+            color: #888;
+        }
+
+        .signup-link a {
+            color: #ff7ab8;
+            font-weight: 600;
+        }
+
+        .signup-link a:hover {
+            text-decoration: underline;
+        }
+
+        .error-message {
+            background: rgba(220, 53, 69, 0.15);
+            border: 1px solid rgba(220, 53, 69, 0.3);
+            color: #ff6b7a;
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Back Link */
+        .back-link {
+            position: absolute;
+            top: -50px;
+            left: 0;
+            color: #888;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s;
+        }
+
+        .back-link:hover {
+            color: #ff7ab8;
+        }
+
+        /* Tombul Robot Maskot */
+        .robot-container {
+            position: fixed;
+            left: 5%;
+            bottom: 50%;
+            transform: translateY(50%);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .robot-svg {
+            width: 180px;
+            height: auto;
+            animation: robotBounce 3s ease-in-out infinite;
+        }
+
+        @keyframes robotBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .robot-eye {
+            animation: robotBlink 4s ease-in-out infinite;
+        }
+
+        @keyframes robotBlink {
+            0%, 45%, 55%, 100% { transform: scale(1); }
+            50% { transform: scale(1, 0.1); }
+        }
+
+        .robot-heart {
+            animation: heartPulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes heartPulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .robot-antenna {
+            animation: antennaPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes antennaPulse {
+            0%, 100% { fill: #ff146a; }
+            50% { fill: #4AADE8; }
+        }
+
+        .robot-mouth {
+            animation: mouthTalk 0.5s ease-in-out infinite;
+        }
+
+        @keyframes mouthTalk {
+            0%, 100% { width: 60px; }
+            50% { width: 40px; }
+        }
+
+        /* Robot Konuşma Balonu */
+        .robot-speech {
+            max-width: 280px;
+        }
+
+        .speech-bubble {
+            background: rgba(30, 30, 50, 0.95);
+            border: 1px solid rgba(255, 122, 184, 0.3);
+            border-radius: 20px;
+            padding: 20px;
+            position: relative;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .speech-bubble::before {
+            content: '';
+            position: absolute;
+            left: -15px;
+            top: 50%;
+            transform: translateY(-50%);
+            border: 10px solid transparent;
+            border-right-color: rgba(30, 30, 50, 0.95);
+        }
+
+        .speech-bubble h3 {
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: #ff7ab8;
+        }
+
+        .speech-bubble p {
+            font-size: 13px;
+            color: #ccc;
+            margin-bottom: 12px;
+        }
+
+        .speech-bubble ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .speech-bubble li {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 6px;
+            padding-left: 0;
+        }
+
+        .speech-bubble li strong {
+            color: #fff;
+        }
+
+        /* Responsive */
+        @media (max-width: 1100px) {
+            .robot-container {
+                left: 2%;
+            }
+            .robot-svg {
+                width: 140px;
+            }
+            .speech-bubble {
+                max-width: 220px;
+                padding: 15px;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .robot-container {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="floating-notes" id="floatingNotes"></div>
+    
+    <!-- Tombul Robot Maskot -->
+    <div class="robot-container">
+        <svg class="robot-svg" viewBox="0 0 200 280" fill="none">
+            <!-- Gölge -->
+            <ellipse cx="100" cy="270" rx="60" ry="10" fill="rgba(0,0,0,0.3)"/>
+            
+            <!-- Gövde -->
+            <rect x="50" y="130" width="100" height="120" rx="30" fill="url(#robotBody)"/>
+            <rect x="55" y="140" width="90" height="50" rx="15" fill="rgba(255,255,255,0.1)"/>
+            
+            <!-- Karın göstergesi -->
+            <circle cx="100" cy="195" r="25" fill="#1a1a2e"/>
+            <circle cx="100" cy="195" r="20" fill="#0f0f1a"/>
+            <circle cx="100" cy="195" r="15" fill="#ff146a" class="robot-heart"/>
+            <text x="100" y="200" text-anchor="middle" fill="#fff" font-size="12" font-weight="bold">♫</text>
+            
+            <!-- Kollar -->
+            <ellipse cx="35" cy="170" rx="18" ry="25" fill="url(#robotBody)"/>
+            <ellipse cx="165" cy="170" rx="18" ry="25" fill="url(#robotBody)"/>
+            <circle cx="35" cy="195" r="12" fill="#4AADE8"/>
+            <circle cx="165" cy="195" r="12" fill="#4AADE8"/>
+            
+            <!-- Bacaklar -->
+            <rect x="60" y="245" width="25" height="25" rx="8" fill="url(#robotBody)"/>
+            <rect x="115" y="245" width="25" height="25" rx="8" fill="url(#robotBody)"/>
+            
+            <!-- Kafa -->
+            <rect x="35" y="30" width="130" height="110" rx="35" fill="url(#robotHead)"/>
+            
+            <!-- Yüz paneli -->
+            <rect x="45" y="50" width="110" height="70" rx="20" fill="#1a1a2e"/>
+            
+            <!-- Gözler -->
+            <circle cx="75" cy="85" r="18" fill="#0f0f1a"/>
+            <circle cx="125" cy="85" r="18" fill="#0f0f1a"/>
+            <circle cx="75" cy="85" r="12" fill="#4AADE8" class="robot-eye"/>
+            <circle cx="125" cy="85" r="12" fill="#ff146a" class="robot-eye"/>
+            <circle cx="78" cy="82" r="4" fill="#fff" opacity="0.8"/>
+            <circle cx="128" cy="82" r="4" fill="#fff" opacity="0.8"/>
+            
+            <!-- Ağız -->
+            <rect x="70" y="105" width="60" height="8" rx="4" fill="#22c55e" class="robot-mouth"/>
+            
+            <!-- Anten -->
+            <rect x="95" y="10" width="10" height="25" rx="3" fill="#E63946"/>
+            <circle cx="100" cy="8" r="10" fill="#ff146a" class="robot-antenna"/>
+            
+            <!-- Kulaklıklar -->
+            <ellipse cx="30" cy="80" rx="12" ry="20" fill="#ff146a"/>
+            <ellipse cx="170" cy="80" rx="12" ry="20" fill="#ff146a"/>
+            <path d="M30 60 Q100 30 170 60" stroke="#ff146a" stroke-width="8" fill="none"/>
+            
+            <!-- Gradientler -->
+            <defs>
+                <linearGradient id="robotBody" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" style="stop-color:#4AADE8"/>
+                    <stop offset="100%" style="stop-color:#2d7aad"/>
+                </linearGradient>
+                <linearGradient id="robotHead" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" style="stop-color:#6366f1"/>
+                    <stop offset="100%" style="stop-color:#4338ca"/>
+                </linearGradient>
+            </defs>
+        </svg>
+        
+        <!-- Proje Açıklaması -->
+        <div class="robot-speech">
+            <div class="speech-bubble">
+                <h3>🎵 FONIX'e Hoş Geldin!</h3>
+                <p>Ben <strong>Fonix</strong>, senin müzik arkadaşın! 🤖</p>
+                <ul>
+                    <li>🎤 <strong>Karaoke:</strong> Arkadaşlarınla şarkı söyle</li>
+                    <li>🎹 <strong>Beatler:</strong> Ücretsiz beat'ler keşfet</li>
+                    <li>✍️ <strong>Söz Yaz:</strong> AI ile şarkı sözleri oluştur</li>
+                    <li>🎙️ <strong>Stüdyo:</strong> Kendi müziğini kaydet</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="login-container">
+        <a href="{{ url_for('index') }}" class="back-link">← Ana Sayfa</a>
+
+        <div class="login-card">
+            <div class="logo">
+                <div class="logo-text"><span class="f">F</span><span class="on">ON</span><span class="ix">IX</span></div>
+                <p>Müziğini Keşfet & Üret</p>
+            </div>
+
+            <h2>Hoş Geldin! 👋</h2>
+            <p class="subtitle">Hesabına giriş yap ve yaratıcılığını serbest bırak</p>
+
+            {% if error %}
+            <div class="error-message">
+                ⚠️ {{ error }}
+            </div>
+            {% endif %}
+
+            <form method="POST">
+                <div class="form-group">
+                    <label>E-posta veya Kullanıcı Adı</label>
+                    <input type="text" name="username_or_email" placeholder="ornek@email.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Şifre</label>
+                    <input type="password" name="password" placeholder="••••••••" required>
+                </div>
+
+                <div class="remember-row">
+                    <label>
+                        <input type="checkbox" name="remember">
+                        Beni hatırla
+                    </label>
+                    <a href="{{ url_for('forgot_password') }}">Şifremi unuttum</a>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    🚀 Giriş Yap
+                </button>
+            </form>
+
+            <div class="signup-link">
+                Hesabın yok mu? <a href="{{ url_for('register') }}">Ücretsiz Kayıt Ol</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const notes = ['♪', '♫', '♬', '🎵', '🎶'];
+        const container = document.getElementById('floatingNotes');
+
+        function createNote() {
+            const note = document.createElement('div');
+            note.className = 'note';
+            note.textContent = notes[Math.floor(Math.random() * notes.length)];
+            note.style.left = Math.random() * 100 + '%';
+            note.style.animationDuration = (15 + Math.random() * 20) + 's';
+            container.appendChild(note);
+            setTimeout(() => note.remove(), 35000);
+        }
+
+        for (let i = 0; i < 15; i++) setTimeout(createNote, i * 300);
+        setInterval(createNote, 2000);
+    </script>
+</body>
+
+</html>

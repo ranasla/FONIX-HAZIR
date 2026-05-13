@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FONIX – Projelerim</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%);
+            color: #f5f5ff;
+            min-height: 100vh;
+        }
+
+        .floating-notes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .note {
+            position: absolute;
+            font-size: 24px;
+            opacity: 0.08;
+            animation: floatNote linear infinite;
+        }
+
+        @keyframes floatNote {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.1; }
+            90% { opacity: 0.1; }
+            100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+        }
+
+        a { color: inherit; text-decoration: none; }
+
+        header {
+            height: 70px;
+            background: rgba(255, 20, 106, 0.95);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-family: 'Times New Roman', Georgia, serif;
+            font-size: 32px;
+            font-weight: bold;
+            text-decoration: none;
+            background: white;
+            padding: 6px 14px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .logo .f { color: #4AADE8; }
+        .logo .on { color: #ffffff; text-shadow: 0 0 2px rgba(0,0,0,0.3); }
+        .logo .ix { color: #E63946; }
+
+        .nav-links {
+            display: flex;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .nav-links a {
+            opacity: 0.9;
+            transition: all 0.3s;
+            padding: 10px 16px;
+            border-radius: 10px;
+        }
+
+        .nav-links a:hover {
+            opacity: 1;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .page-header {
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .page-header h1 {
+            font-size: 32px;
+            background: linear-gradient(135deg, #fff 0%, #ff7ab8 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .page-header p {
+            color: #888;
+            margin-top: 8px;
+        }
+
+        .btn {
+            padding: 14px 24px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ff146a, #ff7ab8);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 30px rgba(255, 20, 106, 0.4);
+        }
+
+        /* Filter Bar */
+        .filter-bar {
+            background: rgba(30, 30, 50, 0.6);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 20px;
+            margin-bottom: 24px;
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 200px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 18px 12px 46px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 14px;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: rgba(255, 122, 184, 0.5);
+        }
+
+        .search-box::before {
+            content: '🔍';
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 16px;
+        }
+
+        .filter-select {
+            padding: 12px 18px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 14px;
+            min-width: 140px;
+        }
+
+        /* Projects Grid */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 24px;
+        }
+
+        .project-card {
+            background: rgba(30, 30, 50, 0.6);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 28px;
+            transition: all 0.3s;
+        }
+
+        .project-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(255, 20, 106, 0.3);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4);
+        }
+
+        .project-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .project-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            flex-shrink: 0;
+        }
+
+        .project-meta {
+            flex: 1;
+        }
+
+        .project-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .project-date {
+            font-size: 13px;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .status-draft {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+        }
+
+        .status-complete {
+            background: rgba(40, 167, 69, 0.2);
+            color: #28a745;
+        }
+
+        .project-preview {
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 18px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            color: #999;
+            line-height: 1.7;
+            max-height: 100px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .project-preview::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 40px;
+            background: linear-gradient(transparent, rgba(30, 30, 50, 0.95));
+        }
+
+        .project-info {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: #888;
+        }
+
+        .project-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .tag {
+            padding: 6px 14px;
+            background: rgba(155, 89, 182, 0.15);
+            border-radius: 20px;
+            font-size: 12px;
+            color: #b39ddb;
+        }
+
+        .tag.genre {
+            background: rgba(255, 20, 106, 0.15);
+            color: #ff7ab8;
+        }
+
+        .project-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .project-actions a,
+        .project-actions button {
+            flex: 1;
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            text-align: center;
+        }
+
+        .edit-btn {
+            background: linear-gradient(135deg, #ff146a, #ff7ab8);
+            color: #fff;
+        }
+
+        .edit-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 25px rgba(255, 20, 106, 0.3);
+        }
+
+        .play-btn {
+            background: rgba(155, 89, 182, 0.2);
+            color: #b39ddb;
+            border: 1px solid rgba(155, 89, 182, 0.3);
+        }
+
+        .play-btn:hover {
+            background: rgba(155, 89, 182, 0.3);
+        }
+
+        .delete-btn {
+            background: rgba(220, 53, 69, 0.15);
+            color: #ff6b7a;
+            border: 1px solid rgba(220, 53, 69, 0.2);
+        }
+
+        .delete-btn:hover {
+            background: rgba(220, 53, 69, 0.25);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            background: rgba(30, 30, 50, 0.4);
+            border-radius: 24px;
+            border: 1px dashed rgba(255, 255, 255, 0.1);
+        }
+
+        .empty-state .icon {
+            font-size: 80px;
+            margin-bottom: 24px;
+            opacity: 0.3;
+        }
+
+        .empty-state h3 {
+            font-size: 24px;
+            color: #888;
+            margin-bottom: 12px;
+        }
+
+        .empty-state p {
+            color: #666;
+            margin-bottom: 24px;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        @media (max-width: 768px) {
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+            }
+
+            .filter-bar {
+                flex-direction: column;
+            }
+
+            .search-box {
+                width: 100%;
+            }
+
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="floating-notes" id="floatingNotes"></div>
+
+    <header>
+        <a href="{{ url_for('index') }}" class="logo"><span class="f">F</span><span class="on">ON</span><span class="ix">IX</span></a>
+        <div class="nav-links">
+            <a href="{{ url_for('index') }}">🏠 Keşfet</a>
+            <a href="{{ url_for('beats_page') }}">🎹 Beatler</a>
+            <a href="{{ url_for('studio') }}">🎙️ Stüdyo</a>
+            <a href="{{ url_for('lyrics_page') }}">✍️ Söz Yaz</a>
+            <a href="{{ url_for('top_page') }}">🏆 Top 10</a>
+            {% if current_user %}
+            <a href="{{ url_for('profile') }}">👤 {{ current_user }}</a>
+            <a href="{{ url_for('logout') }}">🚪 Çıkış</a>
+            {% else %}
+            <a href="{{ url_for('login') }}">🔐 Giriş</a>
+            {% endif %}
+        </div>
+    </header>
+
+    <main>
+        <div class="page-header">
+            <div>
+                <h1>📝 Projelerim</h1>
+                <p>Tüm şarkı sözü projelerinizi burada yönetin</p>
+            </div>
+            <a href="{{ url_for('lyrics_page') }}" class="btn btn-primary">✨ Yeni Proje</a>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Proje ara..." onkeyup="filterProjects()">
+            </div>
+            <select class="filter-select" id="moodFilter" onchange="filterProjects()">
+                <option value="">Tüm Duygular</option>
+                <option value="sad">😢 Hüzünlü</option>
+                <option value="dark">🌙 Karanlık</option>
+                <option value="motivating">💪 Motive Edici</option>
+                <option value="romantic">💕 Romantik</option>
+                <option value="neutral">😐 Nötr</option>
+            </select>
+            <select class="filter-select" id="sortFilter" onchange="filterProjects()">
+                <option value="newest">En Yeni</option>
+                <option value="oldest">En Eski</option>
+                <option value="name">Ada Göre</option>
+            </select>
+        </div>
+
+        {% if projects %}
+        <div class="projects-grid" id="projectsGrid">
+            {% for project in projects %}
+            <div class="project-card" data-title="{{ project.title|lower }}" data-mood="{{ project.mood|lower if project.mood else '' }}" data-date="{{ project.created_at.timestamp() if project.created_at else 0 }}">
+                <div class="project-header">
+                    <div class="project-icon" style="background: linear-gradient(135deg, {{ ['#ff146a', '#9b59b6', '#3498db', '#2ecc71', '#f39c12']|random }}, {{ ['#ff7ab8', '#8e44ad', '#2980b9', '#27ae60', '#e67e22']|random }});">
+                        📝
+                    </div>
+                    <div class="project-meta">
+                        <div class="project-title">{{ project.title }}</div>
+                        <div class="project-date">
+                            📅 {{ project.created_at.strftime('%d %B %Y') if project.created_at else 'Tarih yok' }}
+                            {% if project.lyrics|length < 100 %}
+                            <span class="status-badge status-draft">Taslak</span>
+                            {% else %}
+                            <span class="status-badge status-complete">Tamamlandı</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="project-preview">
+                    {{ project.lyrics if project.lyrics else 'Henüz söz yazılmamış...' }}
+                </div>
+
+                <div class="project-info">
+                    <div class="info-item">📝 {{ project.lyrics.split()|length if project.lyrics else 0 }} kelime</div>
+                    <div class="info-item">📄 {{ project.lyrics.split('\n')|length if project.lyrics else 0 }} satır</div>
+                    {% if project.beat %}
+                    <div class="info-item">🎵 Beat: {{ project.beat.name }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="project-tags">
+                    {% if project.mood %}
+                    <span class="tag">{{ project.mood }}</span>
+                    {% endif %}
+                    {% if project.genre %}
+                    <span class="tag genre">{{ project.genre }}</span>
+                    {% endif %}
+                    {% if project.energy %}
+                    <span class="tag">⚡ {{ project.energy }}</span>
+                    {% endif %}
+                </div>
+
+                <div class="project-actions">
+                    <a href="{{ url_for('lyrics_page') }}?project_id={{ project.id }}" class="edit-btn">✏️ Düzenle</a>
+                    {% if project.beat and project.beat.url %}
+                    <button class="play-btn" onclick="playBeat('{{ project.beat.url }}')">▶️ Çal</button>
+                    {% endif %}
+                    <button class="delete-btn" onclick="deleteProject({{ project.id }})">🗑️</button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="icon">📝</div>
+            <h3>Henüz proje yok</h3>
+            <p>İlk şarkı sözü projenizi oluşturun ve müzikal yolculuğunuza başlayın!</p>
+            <a href="{{ url_for('lyrics_page') }}" class="btn btn-primary">✨ İlk Projeni Oluştur</a>
+        </div>
+        {% endif %}
+    </main>
+
+    <audio id="beatPlayer"></audio>
+
+    <script>
+        function filterProjects() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const mood = document.getElementById('moodFilter').value.toLowerCase();
+            const sort = document.getElementById('sortFilter').value;
+
+            const cards = Array.from(document.querySelectorAll('.project-card'));
+
+            cards.forEach(card => {
+                const title = card.dataset.title;
+                const cardMood = card.dataset.mood;
+
+                const matchSearch = !search || title.includes(search);
+                const matchMood = !mood || cardMood === mood;
+
+                card.style.display = (matchSearch && matchMood) ? 'block' : 'none';
+            });
+
+            // Sorting
+            const grid = document.getElementById('projectsGrid');
+            const sorted = cards.sort((a, b) => {
+                if (sort === 'newest') return parseFloat(b.dataset.date) - parseFloat(a.dataset.date);
+                if (sort === 'oldest') return parseFloat(a.dataset.date) - parseFloat(b.dataset.date);
+                if (sort === 'name') return a.dataset.title.localeCompare(b.dataset.title);
+                return 0;
+            });
+
+            sorted.forEach(card => grid.appendChild(card));
+        }
+
+        function deleteProject(projectId) {
+            if (!confirm('Bu projeyi silmek istediğinizden emin misiniz?')) return;
+
+            fetch('/api/project/delete', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ project_id: projectId })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Hata: ' + data.error);
+                }
+            });
+        }
+
+        function playBeat(url) {
+            const player = document.getElementById('beatPlayer');
+            if (player.src === url && !player.paused) {
+                player.pause();
+            } else {
+                player.src = url;
+                player.play();
+            }
+        }
+
+        // Floating notes
+        const notes = ['♪', '♫', '♬', '🎵', '🎶'];
+        const container = document.getElementById('floatingNotes');
+
+        function createNote() {
+            const note = document.createElement('div');
+            note.className = 'note';
+            note.textContent = notes[Math.floor(Math.random() * notes.length)];
+            note.style.left = Math.random() * 100 + '%';
+            note.style.animationDuration = (15 + Math.random() * 20) + 's';
+            container.appendChild(note);
+            setTimeout(() => note.remove(), 35000);
+        }
+
+        for (let i = 0; i < 10; i++) setTimeout(createNote, i * 400);
+        setInterval(createNote, 2500);
+    </script>
+</body>
+
+</html>

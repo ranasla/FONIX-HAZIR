@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FONIX – Playlistim</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%);
+            color: #f5f5ff;
+            min-height: 100vh;
+        }
+
+        .floating-notes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .note {
+            position: absolute;
+            font-size: 24px;
+            opacity: 0.08;
+            animation: floatNote linear infinite;
+        }
+
+        @keyframes floatNote {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.1; }
+            90% { opacity: 0.1; }
+            100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+        }
+
+        a { color: inherit; text-decoration: none; }
+
+        header {
+            height: 70px;
+            background: rgba(255, 20, 106, 0.95);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-family: 'Times New Roman', Georgia, serif;
+            font-size: 32px;
+            font-weight: bold;
+            text-decoration: none;
+            background: white;
+            padding: 6px 14px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .logo .f { color: #4AADE8; }
+        .logo .on { color: #ffffff; text-shadow: 0 0 2px rgba(0,0,0,0.3); }
+        .logo .ix { color: #E63946; }
+
+        .nav-links {
+            display: flex;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .nav-links a {
+            opacity: 0.9;
+            transition: all 0.3s;
+            padding: 10px 16px;
+            border-radius: 10px;
+        }
+
+        .nav-links a:hover {
+            opacity: 1;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px;
+            padding-bottom: 140px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Playlist Header */
+        .playlist-header {
+            background: rgba(30, 30, 50, 0.6);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 40px;
+            display: flex;
+            gap: 40px;
+            margin-bottom: 30px;
+        }
+
+        .playlist-cover {
+            width: 200px;
+            height: 200px;
+            background: linear-gradient(135deg, #ff146a, #9b59b6);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 80px;
+            flex-shrink: 0;
+            box-shadow: 0 20px 50px rgba(255, 20, 106, 0.3);
+        }
+
+        .playlist-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .playlist-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #ff7ab8;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 12px;
+        }
+
+        .playlist-info h1 {
+            font-size: 48px;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #fff 0%, #ff7ab8 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .playlist-info .desc {
+            color: #888;
+            margin-bottom: 20px;
+            font-size: 15px;
+        }
+
+        .playlist-stats {
+            display: flex;
+            gap: 24px;
+            font-size: 14px;
+            color: #aaa;
+        }
+
+        .playlist-stats span {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .playlist-actions {
+            display: flex;
+            gap: 16px;
+            margin-top: 24px;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border-radius: 30px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ff146a, #ff7ab8);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 40px rgba(255, 20, 106, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        /* Track List */
+        .track-list {
+            background: rgba(30, 30, 50, 0.4);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            overflow: hidden;
+        }
+
+        .track-header {
+            display: grid;
+            grid-template-columns: 50px 1fr 150px 100px 60px;
+            padding: 16px 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .track-item {
+            display: grid;
+            grid-template-columns: 50px 1fr 150px 100px 60px;
+            padding: 14px 24px;
+            align-items: center;
+            transition: all 0.3s;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .track-item:hover {
+            background: rgba(255, 20, 106, 0.08);
+        }
+
+        .track-item.playing {
+            background: rgba(255, 20, 106, 0.15);
+        }
+
+        .track-num {
+            font-size: 14px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .track-item:hover .track-num {
+            display: none;
+        }
+
+        .track-play {
+            display: none;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .track-item:hover .track-play {
+            display: block;
+        }
+
+        .track-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .track-cover {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .track-details h4 {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .track-details p {
+            font-size: 13px;
+            color: #888;
+        }
+
+        .track-genre {
+            font-size: 13px;
+            color: #888;
+        }
+
+        .track-bpm {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .track-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .icon-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: transparent;
+            border: none;
+            color: #888;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .icon-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .icon-btn.delete:hover {
+            background: rgba(220, 53, 69, 0.2);
+            color: #ff6b7a;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+        }
+
+        .empty-state .icon {
+            font-size: 100px;
+            margin-bottom: 24px;
+            opacity: 0.3;
+        }
+
+        .empty-state h3 {
+            font-size: 28px;
+            color: #888;
+            margin-bottom: 12px;
+        }
+
+        .empty-state p {
+            color: #666;
+            margin-bottom: 28px;
+            font-size: 16px;
+        }
+
+        /* Player Bar */
+        .player-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 90px;
+            background: rgba(15, 15, 26, 0.98);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            padding: 0 40px;
+        }
+
+        .now-playing {
+            width: 250px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .now-cover {
+            width: 56px;
+            height: 56px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .now-details h4 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .now-details p {
+            font-size: 12px;
+            color: #888;
+        }
+
+        .player-controls {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .control-buttons {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .ctrl-btn {
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .ctrl-btn:hover {
+            color: #fff;
+        }
+
+        .play-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #ff146a;
+            border: none;
+            color: white;
+            font-size: 22px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .play-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 30px rgba(255, 20, 106, 0.5);
+        }
+
+        .progress-bar {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .time {
+            font-size: 12px;
+            color: #666;
+            min-width: 40px;
+        }
+
+        .progress {
+            flex: 1;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #ff146a;
+            border-radius: 2px;
+            width: 0%;
+            transition: width 0.1s;
+        }
+
+        .volume-control {
+            width: 150px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .volume-slider {
+            flex: 1;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            cursor: pointer;
+        }
+
+        @media (max-width: 900px) {
+            .playlist-header {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+
+            .playlist-stats {
+                justify-content: center;
+            }
+
+            .playlist-actions {
+                justify-content: center;
+            }
+
+            .track-header,
+            .track-item {
+                grid-template-columns: 40px 1fr 60px;
+            }
+
+            .track-genre,
+            .track-bpm {
+                display: none;
+            }
+
+            .player-bar {
+                padding: 0 20px;
+            }
+
+            .now-playing {
+                width: auto;
+            }
+
+            .volume-control {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="floating-notes" id="floatingNotes"></div>
+
+    <header>
+        <a href="{{ url_for('index') }}" class="logo"><span class="f">F</span><span class="on">ON</span><span class="ix">IX</span></a>
+        <div class="nav-links">
+            <a href="{{ url_for('index') }}">🏠 Keşfet</a>
+            <a href="{{ url_for('beats_page') }}">🎹 Beatler</a>
+            <a href="{{ url_for('studio') }}">🎙️ Stüdyo</a>
+            <a href="{{ url_for('lyrics_page') }}">✍️ Söz Yaz</a>
+            <a href="{{ url_for('top_page') }}">🏆 Top 10</a>
+            {% if current_user %}
+            <a href="{{ url_for('profile') }}">👤 {{ current_user }}</a>
+            <a href="{{ url_for('logout') }}">🚪 Çıkış</a>
+            {% else %}
+            <a href="{{ url_for('login') }}">🔐 Giriş</a>
+            {% endif %}
+        </div>
+    </header>
+
+    <main>
+        <!-- Playlist Header -->
+        <div class="playlist-header">
+            <div class="playlist-cover">🎵</div>
+            <div class="playlist-info">
+                <div class="playlist-label">Koleksiyon</div>
+                <h1>Favori Beatlerim</h1>
+                <p class="desc">Beğendiğin tüm beatler burada! Şarkı yazmak için ilham al.</p>
+                <div class="playlist-stats">
+                    <span>🎵 {{ playlist|length }} beat</span>
+                    <span>⏱️ {{ (playlist|length * 3)|round(0)|int }} dk tahmini süre</span>
+                    <span>📅 {{ "Bugün" if playlist else "Henüz eklenmedi" }}</span>
+                </div>
+                <div class="playlist-actions">
+                    {% if playlist %}
+                    <button class="btn btn-primary" onclick="playAll()">▶️ Tümünü Çal</button>
+                    <button class="btn btn-secondary" onclick="shufflePlay()">🔀 Karıştır</button>
+                    {% endif %}
+                    <a href="{{ url_for('beats_page') }}" class="btn btn-secondary">➕ Beat Ekle</a>
+                </div>
+            </div>
+        </div>
+
+        {% if playlist %}
+        <!-- Track List -->
+        <div class="track-list">
+            <div class="track-header">
+                <span>#</span>
+                <span>Başlık</span>
+                <span>Tür</span>
+                <span>BPM</span>
+                <span></span>
+            </div>
+
+            {% for item in playlist %}
+            <div class="track-item" id="track-{{ item.beat.id }}" data-url="{{ item.beat.url }}" data-name="{{ item.beat.name }}" data-artist="{{ item.beat.artist }}" data-color="{{ item.beat.cover_color }}">
+                <div>
+                    <span class="track-num">{{ loop.index }}</span>
+                    <span class="track-play" onclick="playTrack({{ loop.index0 }})">▶</span>
+                </div>
+                <div class="track-info">
+                    <div class="track-cover" style="background: {{ item.beat.cover_color if item.beat.cover_color else 'linear-gradient(135deg, #ff146a, #9b59b6)' }};">
+                        🎵
+                    </div>
+                    <div class="track-details">
+                        <h4>{{ item.beat.name }}</h4>
+                        <p>{{ item.beat.artist }}</p>
+                    </div>
+                </div>
+                <div class="track-genre">{{ item.beat.genre }}</div>
+                <div class="track-bpm">{{ item.beat.bpm if item.beat.bpm else '~' }} BPM</div>
+                <div class="track-actions">
+                    <button class="icon-btn" onclick="openInLyrics({{ item.beat.id }})" title="Söz yaz">✍️</button>
+                    <button class="icon-btn delete" onclick="removeTrack({{ item.beat.id }})" title="Kaldır">✕</button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <!-- Empty State -->
+        <div class="empty-state">
+            <div class="icon">🎵</div>
+            <h3>Playlist'in boş</h3>
+            <p>Beat kütüphanesinden favorilerini ekle ve şarkı yazmaya başla!</p>
+            <a href="{{ url_for('beats_page') }}" class="btn btn-primary">🎹 Beatlere Git</a>
+        </div>
+        {% endif %}
+    </main>
+
+    <!-- Player Bar -->
+    <div class="player-bar">
+        <div class="now-playing">
+            <div class="now-cover" id="nowCover" style="background: #333;">🎵</div>
+            <div class="now-details">
+                <h4 id="nowTitle">Beat Seçilmedi</h4>
+                <p id="nowArtist">Listeden seç</p>
+            </div>
+        </div>
+
+        <div class="player-controls">
+            <div class="control-buttons">
+                <button class="ctrl-btn" onclick="prevTrack()">⏮</button>
+                <button class="play-btn" id="mainPlayBtn" onclick="togglePlay()">▶</button>
+                <button class="ctrl-btn" onclick="nextTrack()">⏭</button>
+            </div>
+            <div class="progress-bar">
+                <span class="time" id="currentTime">0:00</span>
+                <div class="progress" onclick="seek(event)">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <span class="time" id="totalTime">0:00</span>
+            </div>
+        </div>
+
+        <div class="volume-control">
+            <span>🔊</span>
+            <input type="range" class="volume-slider" min="0" max="100" value="70" onchange="setVolume(this.value)">
+        </div>
+    </div>
+
+    <audio id="audioPlayer"></audio>
+
+    <script>
+        const audio = document.getElementById('audioPlayer');
+        const tracks = Array.from(document.querySelectorAll('.track-item'));
+        let currentIndex = -1;
+        let isPlaying = false;
+
+        function playTrack(index) {
+            if (index < 0 || index >= tracks.length) return;
+
+            currentIndex = index;
+            const track = tracks[index];
+            const url = track.dataset.url;
+            const name = track.dataset.name;
+            const artist = track.dataset.artist;
+            const color = track.dataset.color;
+
+            if (!url) {
+                alert('Bu beat için ses dosyası mevcut değil.');
+                return;
+            }
+
+            audio.src = url;
+            audio.play();
+            isPlaying = true;
+
+            document.getElementById('nowTitle').textContent = name;
+            document.getElementById('nowArtist').textContent = artist;
+            document.getElementById('nowCover').style.background = color || '#333';
+            document.getElementById('mainPlayBtn').textContent = '⏸';
+
+            tracks.forEach(t => t.classList.remove('playing'));
+            track.classList.add('playing');
+        }
+
+        function playAll() {
+            if (tracks.length > 0) playTrack(0);
+        }
+
+        function shufflePlay() {
+            const randomIndex = Math.floor(Math.random() * tracks.length);
+            playTrack(randomIndex);
+        }
+
+        function togglePlay() {
+            if (currentIndex === -1 && tracks.length > 0) {
+                playTrack(0);
+                return;
+            }
+
+            if (isPlaying) {
+                audio.pause();
+                isPlaying = false;
+                document.getElementById('mainPlayBtn').textContent = '▶';
+            } else {
+                audio.play();
+                isPlaying = true;
+                document.getElementById('mainPlayBtn').textContent = '⏸';
+            }
+        }
+
+        function prevTrack() {
+            if (currentIndex > 0) playTrack(currentIndex - 1);
+        }
+
+        function nextTrack() {
+            if (currentIndex < tracks.length - 1) playTrack(currentIndex + 1);
+        }
+
+        function setVolume(val) {
+            audio.volume = val / 100;
+        }
+
+        function seek(e) {
+            const rect = e.target.getBoundingClientRect();
+            const percent = (e.clientX - rect.left) / rect.width;
+            audio.currentTime = percent * audio.duration;
+        }
+
+        function formatTime(sec) {
+            const m = Math.floor(sec / 60);
+            const s = Math.floor(sec % 60);
+            return `${m}:${s.toString().padStart(2, '0')}`;
+        }
+
+        audio.addEventListener('timeupdate', () => {
+            const percent = (audio.currentTime / audio.duration) * 100;
+            document.getElementById('progressFill').style.width = percent + '%';
+            document.getElementById('currentTime').textContent = formatTime(audio.currentTime);
+        });
+
+        audio.addEventListener('loadedmetadata', () => {
+            document.getElementById('totalTime').textContent = formatTime(audio.duration);
+        });
+
+        audio.addEventListener('ended', nextTrack);
+
+        function removeTrack(beatId) {
+            if (!confirm('Bu beat\'i playlist\'ten kaldırmak istiyor musun?')) return;
+
+            fetch('/api/playlist/remove', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ beat_id: beatId })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('track-' + beatId).remove();
+                } else {
+                    alert('Hata: ' + data.error);
+                }
+            });
+        }
+
+        function openInLyrics(beatId) {
+            window.location.href = '/lyrics?beat_id=' + beatId;
+        }
+
+        // Floating notes
+        const notes = ['♪', '♫', '♬', '🎵', '🎶'];
+        const container = document.getElementById('floatingNotes');
+
+        function createNote() {
+            const note = document.createElement('div');
+            note.className = 'note';
+            note.textContent = notes[Math.floor(Math.random() * notes.length)];
+            note.style.left = Math.random() * 100 + '%';
+            note.style.animationDuration = (15 + Math.random() * 20) + 's';
+            container.appendChild(note);
+            setTimeout(() => note.remove(), 35000);
+        }
+
+        for (let i = 0; i < 10; i++) setTimeout(createNote, i * 400);
+        setInterval(createNote, 2500);
+    </script>
+</body>
+
+</html>

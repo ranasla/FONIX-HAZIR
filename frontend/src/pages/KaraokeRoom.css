@@ -1,0 +1,358 @@
+/* ── Sayfa çerçevesi ─────────────────────────────────────── */
+.karaoke-room {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%);
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+}
+
+.karaoke-room.loading,
+.karaoke-room.error {
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+}
+
+/* ── Header ──────────────────────────────────────────────── */
+.room-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 24px;
+    background: rgba(0,0,0,0.4);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    gap: 16px;
+    flex-shrink: 0;
+}
+
+.room-info { display: flex; align-items: center; gap: 10px; }
+.room-info h1 { font-size: 18px; margin: 0; }
+
+.room-code {
+    background: rgba(255,255,255,0.08);
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    color: #888;
+}
+
+.header-center {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.song-title-header {
+    font-size: 15px;
+    color: #ccc;
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.now-playing-badge {
+    background: rgba(34,197,94,0.15);
+    color: #22c55e;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+
+.leave-btn {
+    padding: 8px 16px;
+    background: rgba(220,53,69,0.15);
+    color: #ff6b7a;
+    border: 1px solid rgba(220,53,69,0.4);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: background .2s;
+    flex-shrink: 0;
+}
+.leave-btn:hover { background: rgba(220,53,69,0.3); }
+
+/* ── İçerik grid ─────────────────────────────────────────── */
+.room-content {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 16px;
+    padding: 16px;
+    flex: 1;
+    min-height: 0;
+}
+
+.main-area {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-height: 0;
+}
+
+/* ── Lyrics kutusu ───────────────────────────────────────── */
+.lyrics-display {
+    background: rgba(12,12,28,0.97);
+    border-radius: 20px;
+    border: 1px solid rgba(255,122,184,0.15);
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+}
+
+/* ── Karaoke penceresi ───────────────────────────────────── */
+.karaoke-window {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    padding: 24px 32px;
+    position: relative;
+}
+
+/* ── Ortak satır stili ───────────────────────────────────── */
+.kline {
+    width: 100%;
+    text-align: center;
+    padding: 10px 24px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all .35s cubic-bezier(.4,0,.2,1);
+    line-height: 1.4;
+    user-select: none;
+}
+
+/* offset -2 ve +2: en uzak, en soluk */
+.kline.offset-n2,
+.kline.offset-2 {
+    font-size: 16px;
+    color: rgba(255,255,255,0.18);
+    font-weight: 400;
+    transform: scale(0.92);
+}
+
+/* offset -1 ve +1: yakın, biraz soluk */
+.kline.offset-n1,
+.kline.offset-1 {
+    font-size: 20px;
+    color: rgba(255,255,255,0.45);
+    font-weight: 500;
+    transform: scale(0.97);
+}
+
+/* offset 0: aktif satır — büyük, parlak */
+.kline.active {
+    font-size: 30px;
+    font-weight: 800;
+    color: #fff;
+    background: linear-gradient(135deg, rgba(255,20,106,0.2), rgba(255,122,184,0.08));
+    text-shadow:
+        0 0 30px rgba(255,20,106,0.8),
+        0 0 60px rgba(255,20,106,0.3);
+    transform: scale(1.04);
+    padding: 14px 28px;
+    border-radius: 16px;
+    letter-spacing: 0.02em;
+}
+
+.kline:hover:not(.active) { color: rgba(255,255,255,0.65); }
+
+/* ── İlerleme göstergesi ─────────────────────────────────── */
+.lyric-progress {
+    position: absolute;
+    bottom: 10px;
+    right: 16px;
+    font-size: 11px;
+    color: rgba(255,255,255,0.2);
+    font-variant-numeric: tabular-nums;
+}
+
+/* ── Yükleniyor / bulunamadı ─────────────────────────────── */
+.lyrics-status {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    width: 100%;
+    height: 100%;
+    min-height: 200px;
+    color: #555;
+    font-size: 15px;
+    padding: 24px;
+}
+
+.lyrics-spinner {
+    width: 32px;
+    height: 32px;
+    border: 2px solid rgba(255,122,184,0.15);
+    border-top-color: #ff146a;
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.manual-lyrics {
+    width: 100%;
+    min-height: 120px;
+    padding: 12px;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    color: #fff;
+    font-size: 13px;
+    resize: vertical;
+}
+.manual-lyrics:focus { outline: none; border-color: rgba(255,122,184,0.5); }
+
+/* ── Player bar ──────────────────────────────────────────── */
+.player-bar {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 16px;
+    background: rgba(20,20,40,0.7);
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.07);
+}
+
+.play-btn {
+    padding: 10px 28px;
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: #fff;
+    border: none;
+    border-radius: 24px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: transform .2s, box-shadow .2s;
+}
+.play-btn:hover { transform: scale(1.04); box-shadow: 0 4px 16px rgba(34,197,94,.4); }
+
+.time-display { font-size: 13px; color: #888; font-variant-numeric: tabular-nums; }
+
+/* ── Şarkı seçimi ────────────────────────────────────────── */
+.song-selection {
+    background: rgba(20,20,40,0.7);
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.07);
+    padding: 14px;
+}
+
+.selection-tabs { display: flex; gap: 8px; margin-bottom: 12px; }
+
+.selection-tabs button {
+    flex: 1;
+    padding: 10px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    color: #888;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all .2s;
+}
+.selection-tabs button:hover { background: rgba(255,255,255,0.1); color: #fff; }
+.selection-tabs button.active { background: rgba(255,20,106,0.2); border-color: #ff146a; color: #fff; }
+
+.youtube-input { display: flex; gap: 8px; }
+.youtube-input input {
+    flex: 1;
+    padding: 10px 14px;
+    background: rgba(0,0,0,0.35);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 8px;
+    color: #fff;
+    font-size: 13px;
+}
+.youtube-input input:focus { outline: none; border-color: rgba(255,0,0,0.5); }
+.youtube-input input::placeholder { color: #555; }
+
+.youtube-input button {
+    padding: 10px 18px;
+    background: linear-gradient(135deg,#ff0000,#cc0000);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    transition: opacity .2s;
+}
+.youtube-input button:disabled { opacity: .5; cursor: not-allowed; }
+
+.beats-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(130px,1fr)); gap: 8px; }
+
+.beat-option {
+    padding: 10px 12px;
+    background: rgba(0,0,0,0.25);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    cursor: pointer;
+    text-align: left;
+    color: #fff;
+    transition: border-color .2s;
+}
+.beat-option:hover { border-color: rgba(255,122,184,0.4); }
+.beat-option.active { border-color: #ff146a; background: rgba(255,20,106,0.15); }
+.beat-name { display: block; font-size: 13px; font-weight: 600; margin-bottom: 3px; }
+.beat-bpm { font-size: 11px; color: #888; }
+
+/* ── Sidebar ─────────────────────────────────────────────── */
+.sidebar { display: flex; flex-direction: column; gap: 12px; min-height: 0; }
+
+.participants,
+.chat {
+    background: rgba(20,20,40,0.7);
+    border-radius: 14px;
+    padding: 14px;
+    border: 1px solid rgba(255,255,255,0.07);
+}
+
+.participants h3, .chat h3 { font-size: 14px; margin-bottom: 10px; color: #ccc; }
+
+.participants ul { list-style: none; padding: 0; margin: 0; }
+.participants li { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+
+.avatar {
+    width: 28px; height: 28px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700;
+}
+.username { font-size: 13px; }
+.host-badge { margin-left: auto; background: rgba(245,158,11,.2); color: #f59e0b; padding: 2px 7px; border-radius: 8px; font-size: 10px; }
+
+.chat { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+
+.messages { flex: 1; overflow-y: auto; min-height: 0; max-height: 240px; padding: 4px 0; }
+
+.message { padding: 6px 10px; margin-bottom: 6px; border-radius: 8px; font-size: 12px; }
+.message.user { background: rgba(0,0,0,0.25); }
+.message.system { background: rgba(74,173,232,0.12); color: #4AADE8; text-align: center; font-style: italic; }
+
+.chat-form { display: flex; gap: 6px; margin-top: 8px; }
+.chat-form input { flex: 1; padding: 9px 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff; font-size: 12px; }
+.chat-form input:focus { outline: none; border-color: rgba(255,122,184,0.4); }
+.chat-form button { padding: 9px 14px; background: linear-gradient(135deg,#ff146a,#ff7ab8); color: #fff; border: none; border-radius: 8px; cursor: pointer; font-size: 12px; }
+
+.spinner { width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.1); border-top-color: #ff146a; border-radius: 50%; animation: spin 1s linear infinite; }
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 860px) {
+    .room-content { grid-template-columns: 1fr; }
+    .sidebar { flex-direction: row; }
+    .participants, .chat { flex: 1; }
+    .messages { max-height: 140px; }
+}

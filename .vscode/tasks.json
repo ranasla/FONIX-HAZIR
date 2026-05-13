@@ -1,0 +1,45 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Run app.py",
+			"type": "shell",
+			"command": "python app.py",
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "Run app.py",
+			"type": "shell",
+			"command": "python app.py",
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "Run app.py",
+			"type": "shell",
+			"command": "python app.py",
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "Run app.py (venv)",
+			"type": "shell",
+			"command": "C:/Users/emirh/OneDrive/Desktop/FONİX/venv/Scripts/python.exe app.py",
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "Run app.py (venv)",
+			"type": "shell",
+			"command": "C:/Users/emirh/OneDrive/Desktop/FONİX/venv/Scripts/python.exe app.py",
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		}
+	]
+}

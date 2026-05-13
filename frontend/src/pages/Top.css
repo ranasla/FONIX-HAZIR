@@ -1,0 +1,82 @@
+.top-hero {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.hero-badge {
+  font-size: 60px;
+  margin-bottom: 20px;
+}
+
+.top-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.top-item {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 16px;
+  background: rgba(30, 30, 50, 0.6);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: all 0.3s;
+}
+
+.top-item:hover {
+  border-color: rgba(255, 20, 106, 0.3);
+  transform: translateX(8px);
+}
+
+.rank {
+  font-size: 24px;
+  font-weight: 800;
+  width: 50px;
+  text-align: center;
+  color: #666;
+}
+
+.rank.top-three {
+  font-size: 32px;
+}
+
+.top-item .song-card {
+  flex: 1;
+  margin: 0;
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+.stats {
+  display: flex;
+  gap: 16px;
+  font-size: 14px;
+  color: #888;
+}
+
+.stats .plays {
+  color: #3498db;
+}
+
+.stats .rating {
+  color: #f1c40f;
+}
+
+@media (max-width: 768px) {
+  .top-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .rank {
+    width: auto;
+  }
+  
+  .stats {
+    width: 100%;
+    justify-content: space-around;
+  }
+}

@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FONIX – Top 10</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%);
+            color: #f5f5ff;
+            min-height: 100vh;
+        }
+
+        .floating-notes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .note {
+            position: absolute;
+            font-size: 24px;
+            opacity: 0.08;
+            animation: floatNote linear infinite;
+        }
+
+        @keyframes floatNote {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.1; }
+            90% { opacity: 0.1; }
+            100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+        }
+
+        a { color: inherit; text-decoration: none; }
+
+        header {
+            height: 70px;
+            background: rgba(255, 20, 106, 0.95);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-family: 'Times New Roman', Georgia, serif;
+            font-size: 32px;
+            font-weight: bold;
+            text-decoration: none;
+            background: white;
+            padding: 6px 14px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .logo .f { color: #4AADE8; }
+        .logo .on { color: #ffffff; text-shadow: 0 0 2px rgba(0,0,0,0.3); }
+        .logo .ix { color: #E63946; }
+
+        .nav-links {
+            display: flex;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .nav-links a {
+            opacity: 0.9;
+            transition: all 0.3s;
+            padding: 10px 16px;
+            border-radius: 10px;
+        }
+
+        .nav-links a:hover {
+            opacity: 1;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        main {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px;
+            padding-bottom: 120px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Hero Banner */
+        .hero-banner {
+            background: linear-gradient(135deg, rgba(255, 20, 106, 0.3), rgba(155, 89, 182, 0.2));
+            border: 1px solid rgba(255, 20, 106, 0.3);
+            border-radius: 28px;
+            padding: 50px;
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-banner::before {
+            content: '🏆';
+            position: absolute;
+            font-size: 200px;
+            opacity: 0.05;
+            top: -40px;
+            right: -40px;
+        }
+
+        .hero-banner h1 {
+            font-size: 52px;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-banner p {
+            color: #aaa;
+            font-size: 18px;
+        }
+
+        /* Category Tabs */
+        .category-tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 32px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 14px 28px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 30px;
+            color: #888;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tab-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #ff146a, #ff7ab8);
+            border-color: transparent;
+            color: #fff;
+        }
+
+        /* Top List */
+        .top-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .rank-card {
+            background: rgba(30, 30, 50, 0.6);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 20px 28px;
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .rank-card:hover {
+            transform: translateX(8px);
+            border-color: rgba(255, 20, 106, 0.3);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .rank-card.gold {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 193, 7, 0.05));
+            border-color: rgba(255, 215, 0, 0.3);
+        }
+
+        .rank-card.silver {
+            background: linear-gradient(135deg, rgba(192, 192, 192, 0.15), rgba(169, 169, 169, 0.05));
+            border-color: rgba(192, 192, 192, 0.3);
+        }
+
+        .rank-card.bronze {
+            background: linear-gradient(135deg, rgba(205, 127, 50, 0.15), rgba(184, 115, 51, 0.05));
+            border-color: rgba(205, 127, 50, 0.3);
+        }
+
+        .rank-number {
+            font-size: 32px;
+            font-weight: 900;
+            min-width: 50px;
+            text-align: center;
+        }
+
+        .rank-card.gold .rank-number { color: #ffd700; }
+        .rank-card.silver .rank-number { color: #c0c0c0; }
+        .rank-card.bronze .rank-number { color: #cd7f32; }
+        .rank-card:not(.gold):not(.silver):not(.bronze) .rank-number { color: #666; }
+
+        .song-cover {
+            width: 70px;
+            height: 70px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            flex-shrink: 0;
+        }
+
+        .song-info {
+            flex: 1;
+        }
+
+        .song-info h3 {
+            font-size: 20px;
+            margin-bottom: 6px;
+        }
+
+        .song-info p {
+            color: #888;
+            font-size: 14px;
+        }
+
+        .song-stats {
+            display: flex;
+            gap: 20px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat .value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #ff7ab8;
+        }
+
+        .stat .label {
+            font-size: 11px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .play-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff146a, #ff7ab8);
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+
+        .play-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(255, 20, 106, 0.5);
+        }
+
+        /* Trophy Icons */
+        .trophy {
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            font-size: 40px;
+            transform: rotate(-15deg);
+            opacity: 0.8;
+        }
+
+        .rank-card.gold .trophy::after { content: '🥇'; }
+        .rank-card.silver .trophy::after { content: '🥈'; }
+        .rank-card.bronze .trophy::after { content: '🥉'; }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            background: rgba(30, 30, 50, 0.4);
+            border-radius: 24px;
+            border: 1px dashed rgba(255, 255, 255, 0.1);
+        }
+
+        .empty-state .icon {
+            font-size: 80px;
+            margin-bottom: 24px;
+            opacity: 0.3;
+        }
+
+        .empty-state h3 {
+            font-size: 24px;
+            color: #888;
+            margin-bottom: 12px;
+        }
+
+        .empty-state p {
+            color: #666;
+            margin-bottom: 24px;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border-radius: 14px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ff146a, #ff7ab8);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 30px rgba(255, 20, 106, 0.4);
+        }
+
+        /* Player Bar */
+        .player-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 80px;
+            background: rgba(15, 15, 26, 0.98);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            padding: 0 40px;
+        }
+
+        .now-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .now-cover {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .now-info h4 {
+            font-size: 14px;
+        }
+
+        .now-info p {
+            font-size: 12px;
+            color: #888;
+        }
+
+        @media (max-width: 768px) {
+            .hero-banner {
+                padding: 30px;
+            }
+
+            .hero-banner h1 {
+                font-size: 36px;
+            }
+
+            .rank-card {
+                flex-wrap: wrap;
+                padding: 20px;
+            }
+
+            .song-stats {
+                width: 100%;
+                justify-content: center;
+                margin-top: 16px;
+            }
+
+            .player-bar {
+                padding: 0 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="floating-notes" id="floatingNotes"></div>
+
+    <header>
+        <a href="{{ url_for('index') }}" class="logo"><span class="f">F</span><span class="on">ON</span><span class="ix">IX</span></a>
+        <div class="nav-links">
+            <a href="{{ url_for('index') }}">🏠 Keşfet</a>
+            <a href="{{ url_for('beats_page') }}">🎹 Beatler</a>
+            <a href="{{ url_for('studio') }}">🎙️ Stüdyo</a>
+            <a href="{{ url_for('lyrics_page') }}">✍️ Söz Yaz</a>
+            <a href="{{ url_for('top_page') }}">🏆 Top 10</a>
+            {% if current_user %}
+            <a href="{{ url_for('profile') }}">👤 {{ current_user }}</a>
+            <a href="{{ url_for('logout') }}">🚪 Çıkış</a>
+            {% else %}
+            <a href="{{ url_for('login') }}">🔐 Giriş</a>
+            {% endif %}
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Banner -->
+        <div class="hero-banner">
+            <h1>🏆 Top 10</h1>
+            <p>En çok beğenilen ve dinlenen şarkılar</p>
+        </div>
+
+        <!-- Category Tabs -->
+        <div class="category-tabs">
+            <button class="tab-btn active" onclick="filterCategory('all')">🔥 Tümü</button>
+            <button class="tab-btn" onclick="filterCategory('trap')">🎤 Trap</button>
+            <button class="tab-btn" onclick="filterCategory('hip-hop')">🎧 Hip-Hop</button>
+            <button class="tab-btn" onclick="filterCategory('r&b')">💜 R&B</button>
+            <button class="tab-btn" onclick="filterCategory('pop')">🎵 Pop</button>
+        </div>
+
+        {% if songs %}
+        <!-- Top List -->
+        <div class="top-list" id="topList">
+            {% for song in songs %}
+            <div class="rank-card {{ 'gold' if loop.index == 1 else ('silver' if loop.index == 2 else ('bronze' if loop.index == 3 else '')) }}" data-genre="{{ song.genre|lower if song.genre else 'trap' }}">
+                {% if loop.index <= 3 %}<div class="trophy"></div>{% endif %}
+                <div class="rank-number">{{ loop.index }}</div>
+                <div class="song-cover" style="background: {{ ['linear-gradient(135deg, #ff146a, #9b59b6)', 'linear-gradient(135deg, #3498db, #2ecc71)', 'linear-gradient(135deg, #f39c12, #e74c3c)', 'linear-gradient(135deg, #9b59b6, #3498db)']|random }};">
+                    🎵
+                </div>
+                <div class="song-info">
+                    <h3>{{ song.title }}</h3>
+                    <p>{{ song.artist }} {% if song.genre %}• {{ song.genre }}{% endif %}</p>
+                </div>
+                <div class="song-stats">
+                    <div class="stat">
+                        <div class="value">{{ song.likes if song.likes else (1000 - loop.index * 80)|int }}</div>
+                        <div class="label">Beğeni</div>
+                    </div>
+                    <div class="stat">
+                        <div class="value">{{ song.plays if song.plays else (5000 - loop.index * 300)|int }}</div>
+                        <div class="label">Dinlenme</div>
+                    </div>
+                </div>
+                <button class="play-btn" onclick="playSong('{{ song.file_path if song.file_path else '' }}', '{{ song.title }}', '{{ song.artist }}')">
+                    ▶
+                </button>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <!-- Empty State -->
+        <div class="empty-state">
+            <div class="icon">🏆</div>
+            <h3>Henüz sıralama yok</h3>
+            <p>Şarkı yükle ve topluluğun favorisi ol!</p>
+            <a href="{{ url_for('add_song') }}" class="btn btn-primary">🎤 Şarkı Yükle</a>
+        </div>
+        {% endif %}
+    </main>
+
+    <!-- Player Bar -->
+    <div class="player-bar" id="playerBar" style="display: none;">
+        <div class="now-info">
+            <div class="now-cover" id="nowCover" style="background: linear-gradient(135deg, #ff146a, #9b59b6);">🎵</div>
+            <div>
+                <h4 id="nowTitle">-</h4>
+                <p id="nowArtist">-</p>
+            </div>
+        </div>
+        <button class="play-btn" id="playBtn" onclick="togglePlay()">⏸</button>
+    </div>
+
+    <audio id="audioPlayer"></audio>
+
+    <script>
+        const audio = document.getElementById('audioPlayer');
+        let isPlaying = false;
+
+        function filterCategory(genre) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            document.querySelectorAll('.rank-card').forEach(card => {
+                if (genre === 'all' || card.dataset.genre.includes(genre)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        function playSong(url, title, artist) {
+            if (!url) {
+                alert('Bu şarkı için ses dosyası mevcut değil.');
+                return;
+            }
+
+            audio.src = url;
+            audio.play();
+            isPlaying = true;
+
+            document.getElementById('nowTitle').textContent = title;
+            document.getElementById('nowArtist').textContent = artist;
+            document.getElementById('playBtn').textContent = '⏸';
+            document.getElementById('playerBar').style.display = 'flex';
+        }
+
+        function togglePlay() {
+            if (isPlaying) {
+                audio.pause();
+                isPlaying = false;
+                document.getElementById('playBtn').textContent = '▶';
+            } else {
+                audio.play();
+                isPlaying = true;
+                document.getElementById('playBtn').textContent = '⏸';
+            }
+        }
+
+        // Floating notes
+        const notes = ['♪', '♫', '♬', '🎵', '🎶', '🏆'];
+        const container = document.getElementById('floatingNotes');
+
+        function createNote() {
+            const note = document.createElement('div');
+            note.className = 'note';
+            note.textContent = notes[Math.floor(Math.random() * notes.length)];
+            note.style.left = Math.random() * 100 + '%';
+            note.style.animationDuration = (15 + Math.random() * 20) + 's';
+            container.appendChild(note);
+            setTimeout(() => note.remove(), 35000);
+        }
+
+        for (let i = 0; i < 10; i++) setTimeout(createNote, i * 400);
+        setInterval(createNote, 2500);
+    </script>
+</body>
+
+</html>

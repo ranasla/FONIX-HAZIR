@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%);
+            color: #f5f5ff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Kayan Notalar Animasyonu */
+        .floating-notes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .note {
+            position: absolute;
+            font-size: 24px;
+            opacity: 0.1;
+            animation: floatNote linear infinite;
+        }
+
+        @keyframes floatNote {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.15;
+            }
+            90% {
+                opacity: 0.15;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        /* Header */
+        header {
+            height: 70px;
+            background: rgba(255, 20, 106, 0.95);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 30px rgba(255, 20, 106, 0.3);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-family: 'Times New Roman', Georgia, serif;
+            font-size: 32px;
+            font-weight: bold;
+            text-decoration: none;
+            background: white;
+            padding: 6px 14px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .logo .f { color: #4AADE8; }
+        .logo .on { color: #ffffff; text-shadow: 0 0 2px rgba(0,0,0,0.3); }
+        .logo .ix { color: #E63946; }
+
+        .nav-links {
+            display: flex;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .nav-links a {
+            opacity: 0.9;
+            transition: all 0.3s;
+            padding: 10px 16px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .nav-links a:hover {
+            opacity: 1;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-links a.active {
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        /* Main Container */
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 30px 0 50px;
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #fff 0%, #ff7ab8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 16px;
+        }
+
+        .hero p {
+            font-size: 18px;
+            color: #a0a0b8;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Create Room Section */
+        .create-room-section {
+            background: linear-gradient(135deg, rgba(255, 20, 106, 0.2) 0%, rgba(255, 122, 184, 0.1) 100%);
+            border: 1px solid rgba(255, 122, 184, 0.3);
+            border-radius: 24px;
+            padding: 32px;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .create-room-section h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .create-form {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            text-align: left;
+        }
+
+        .form-group label {
+            font-size: 13px;
+            color: #a0a0b8;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            padding: 14px 18px;
+            color: #fff;
+            font-size: 15px;
+            min-width: 200px;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #ff146a;
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ff146a, #ff7ab8);
+            color: #fff;
+            box-shadow: 0 4px 20px rgba(255, 20, 106, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(255, 20, 106, 0.5);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* Rooms Grid */
+        .rooms-section h2 {
+            font-size: 24px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .rooms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+        }
+
+        .room-card {
+            background: rgba(30, 30, 50, 0.8);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 24px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .room-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #ff146a, #ff7ab8);
+        }
+
+        .room-card:hover {
+            border-color: rgba(255, 122, 184, 0.3);
+            transform: translateY(-4px);
+            box-shadow: 0 10px 40px rgba(255, 20, 106, 0.15);
+        }
+
+        .room-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+
+        .room-name {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .room-host {
+            font-size: 14px;
+            color: #a0a0b8;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .room-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .room-status.live {
+            background: rgba(255, 59, 48, 0.2);
+            color: #ff3b30;
+        }
+
+        .room-status.waiting {
+            background: rgba(52, 199, 89, 0.2);
+            color: #34c759;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .live .status-dot {
+            background: #ff3b30;
+        }
+
+        .waiting .status-dot {
+            background: #34c759;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+
+        .room-info {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .room-info-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+            color: #a0a0b8;
+        }
+
+        .room-info-item span {
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .room-beat {
+            background: rgba(255, 122, 184, 0.1);
+            border: 1px solid rgba(255, 122, 184, 0.2);
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .beat-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #ff146a, #ff7ab8);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .beat-info {
+            flex: 1;
+        }
+
+        .beat-name {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .beat-playing {
+            font-size: 12px;
+            color: #ff7ab8;
+        }
+
+        .room-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .room-actions .btn {
+            flex: 1;
+            justify-content: center;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .empty-state h3 {
+            font-size: 20px;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+
+        .empty-state p {
+            color: #a0a0b8;
+        }
+
+        /* Join by Code */
+        .join-code-section {
+            background: rgba(30, 30, 50, 0.6);
+            border: 1px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            padding: 24px;
+            margin-top: 40px;
+            text-align: center;
+        }
+
+        .join-code-section h3 {
+            font-size: 18px;
+            margin-bottom: 16px;
+            color: #a0a0b8;
+        }
+
+        .join-code-form {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .join-code-form input {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            padding: 14px 18px;
+            color: #fff;
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            width: 180px;
+            text-align: center;
+        }
+
+        .join-code-form input::placeholder {
+            letter-spacing: 2px;
+            font-weight: 400;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            main {
+                padding: 20px;
+            }
+
+            .hero h1 {
+                font-size: 32px;
+            }
+
+            .create-form {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .form-group input,
+            .form-group select {
+                min-width: 100%;
+            }
+
+            .rooms-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="floating-notes" id="floatingNotes"></div>
+
+    <header>
+        <a href="{{ url_for('index') }}" class="logo"><span class="f">F</span><span class="on">ON</span><span class="ix">IX</span></a>
+        <div class="nav-links">
+            <a href="{{ url_for('index') }}">🏠 Keşfet</a>
+            <a href="{{ url_for('beats_page') }}">🎹 Beatler</a>
+            <a href="{{ url_for('karaoke_lobby') }}" class="active">🎤 Karaoke</a>
+            <a href="{{ url_for('studio') }}">🎙️ Stüdyo</a>
+            <a href="{{ url_for('lyrics_page') }}">✍️ Söz Yaz</a>
+            {% if current_user %}
+            <a href="{{ url_for('profile') }}">👤 {{ current_user }}</a>
+            <a href="{{ url_for('logout') }}">🚪 Çıkış</a>
+            {% else %}
+            <a href="{{ url_for('login') }}">🔐 Giriş</a>
+            {% endif %}
+        </div>
+    </header>
+
+    <main>
+        <div class="hero">
+            <h1>🎤 Karaoke Odaları</h1>
+            <p>Arkadaşlarınla birlikte şarkı söyle, eğlen!</p>
+        </div>
+
+        <!-- Create Room Section -->
+        <div class="create-room-section">
+            <h2>🎉 Yeni Oda Oluştur</h2>
+            <form action="{{ url_for('create_karaoke_room') }}" method="POST" class="create-form">
+                <div class="form-group">
+                    <label>Oda Adı</label>
+                    <input type="text" name="room_name" placeholder="Eğlenceli Karaoke Gecesi" required>
+                </div>
+                <div class="form-group">
+                    <label>Max Katılımcı</label>
+                    <select name="max_participants">
+                        <option value="4">4 Kişi</option>
+                        <option value="6">6 Kişi</option>
+                        <option value="8" selected>8 Kişi</option>
+                        <option value="12">12 Kişi</option>
+                        <option value="20">20 Kişi</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    ✨ Oda Oluştur
+                </button>
+            </form>
+        </div>
+
+        <!-- Join by Code -->
+        <div class="join-code-section">
+            <h3>🔗 Oda Kodunu Biliyor musun?</h3>
+            <form action="" class="join-code-form" id="joinByCodeForm">
+                <input type="text" id="roomCodeInput" placeholder="ABC123" maxlength="6" pattern="[A-Za-z0-9]{6}">
+                <button type="submit" class="btn btn-secondary">Katıl →</button>
+            </form>
+        </div>
+
+        <!-- Active Rooms -->
+        <div class="rooms-section" style="margin-top: 50px;">
+            <h2>🔥 Aktif Odalar</h2>
+            
+            {% if rooms %}
+            <div class="rooms-grid">
+                {% for room in rooms %}
+                <div class="room-card">
+                    <div class="room-header">
+                        <div>
+                            <div class="room-name">{{ room.name }}</div>
+                            <div class="room-host">👑 {{ room.host.username }}</div>
+                        </div>
+                        <div class="room-status {% if room.is_playing %}live{% else %}waiting{% endif %}">
+                            <div class="status-dot"></div>
+                            {% if room.is_playing %}CANLI{% else %}BEKLİYOR{% endif %}
+                        </div>
+                    </div>
+
+                    <div class="room-info">
+                        <div class="room-info-item">
+                            👥 <span>{{ room.participants|length }}/{{ room.max_participants }}</span>
+                        </div>
+                        <div class="room-info-item">
+                            🔑 <span>{{ room.room_code }}</span>
+                        </div>
+                    </div>
+
+                    {% if room.beat %}
+                    <div class="room-beat">
+                        <div class="beat-icon">🎵</div>
+                        <div class="beat-info">
+                            <div class="beat-name">{{ room.beat.name }}</div>
+                            <div class="beat-playing">{% if room.is_playing %}Şu an çalıyor...{% else %}Seçili beat{% endif %}</div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="room-actions">
+                        {% if room.participants|length < room.max_participants %}
+                        <a href="{{ url_for('karaoke_room', room_code=room.room_code) }}" class="btn btn-primary">
+                            🚀 Katıl
+                        </a>
+                        {% else %}
+                        <button class="btn btn-secondary" disabled>Oda Dolu</button>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon">🎤</div>
+                <h3>Henüz aktif oda yok</h3>
+                <p>İlk karaoke odasını sen oluştur!</p>
+            </div>
+            {% endif %}
+        </div>
+    </main>
+
+    <script>
+        // Floating notes animation
+        const notes = ['♪', '♫', '♬', '🎵', '🎶', '🎤'];
+        const container = document.getElementById('floatingNotes');
+
+        function createNote() {
+            const note = document.createElement('div');
+            note.className = 'note';
+            note.textContent = notes[Math.floor(Math.random() * notes.length)];
+            note.style.left = Math.random() * 100 + '%';
+            note.style.animationDuration = (15 + Math.random() * 20) + 's';
+            container.appendChild(note);
+            setTimeout(() => note.remove(), 35000);
+        }
+
+        for (let i = 0; i < 10; i++) setTimeout(createNote, i * 500);
+        setInterval(createNote, 2500);
+
+        // Join by code form
+        document.getElementById('joinByCodeForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const code = document.getElementById('roomCodeInput').value.toUpperCase().trim();
+            if (code.length === 6) {
+                window.location.href = '/karaoke/room/' + code;
+            }
+        });
+
+        // Auto uppercase for room code input
+        document.getElementById('roomCodeInput').addEventListener('input', function(e) {
+            e.target.value = e.target.value.toUpperCase();
+        });
+    </script>
+</body>
+
+</html>

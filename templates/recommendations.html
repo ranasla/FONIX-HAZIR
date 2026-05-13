@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FONIX – Beat Önerileri</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%);
+            color: #f5f5ff;
+            min-height: 100vh;
+        }
+
+        .floating-notes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .note {
+            position: absolute;
+            font-size: 24px;
+            opacity: 0.08;
+            animation: floatNote linear infinite;
+        }
+
+        @keyframes floatNote {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.1; }
+            90% { opacity: 0.1; }
+            100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+        }
+
+        a { color: inherit; text-decoration: none; }
+
+        header {
+            height: 70px;
+            background: rgba(255, 20, 106, 0.95);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-family: 'Times New Roman', Georgia, serif;
+            font-size: 32px;
+            font-weight: bold;
+            text-decoration: none;
+            background: white;
+            padding: 6px 14px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .logo .f { color: #4AADE8; }
+        .logo .on { color: #ffffff; text-shadow: 0 0 2px rgba(0,0,0,0.3); }
+        .logo .ix { color: #E63946; }
+
+        .nav-links {
+            display: flex;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .nav-links a {
+            opacity: 0.9;
+            transition: all 0.3s;
+            padding: 10px 16px;
+            border-radius: 10px;
+        }
+
+        .nav-links a:hover {
+            opacity: 1;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .page-header h1 {
+            font-size: 42px;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #fff 0%, #ff7ab8 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .page-header p {
+            color: #888;
+            font-size: 16px;
+        }
+
+        /* AI Analysis Box */
+        .ai-box {
+            background: linear-gradient(135deg, rgba(155, 89, 182, 0.2), rgba(255, 20, 106, 0.1));
+            border: 1px solid rgba(155, 89, 182, 0.3);
+            border-radius: 24px;
+            padding: 40px;
+            margin-bottom: 40px;
+        }
+
+        .ai-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .ai-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+        }
+
+        .ai-header h2 {
+            font-size: 24px;
+        }
+
+        .ai-header p {
+            color: #888;
+            font-size: 14px;
+        }
+
+        .lyrics-input-area {
+            margin-bottom: 24px;
+        }
+
+        .lyrics-input-area textarea {
+            width: 100%;
+            min-height: 150px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 20px;
+            color: #fff;
+            font-size: 15px;
+            line-height: 1.7;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .lyrics-input-area textarea:focus {
+            outline: none;
+            border-color: rgba(155, 89, 182, 0.5);
+        }
+
+        .lyrics-input-area textarea::placeholder {
+            color: #555;
+        }
+
+        .btn {
+            padding: 16px 32px;
+            border-radius: 14px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-ai {
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+            color: #fff;
+        }
+
+        .btn-ai:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 30px rgba(155, 89, 182, 0.4);
+        }
+
+        /* Analysis Result */
+        .analysis-result {
+            display: none;
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .analysis-result.show {
+            display: block;
+        }
+
+        .analysis-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .analysis-item {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 14px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .analysis-item .label {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .analysis-item .value {
+            font-size: 22px;
+            font-weight: 700;
+            color: #ff7ab8;
+        }
+
+        /* Recommendations Section */
+        .recommendations-section {
+            margin-top: 40px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .beat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        .beat-card {
+            background: rgba(30, 30, 50, 0.6);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 24px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .beat-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(255, 20, 106, 0.3);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4);
+        }
+
+        .match-score {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: linear-gradient(135deg, #28a745, #20c997);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .beat-cover {
+            width: 100%;
+            height: 140px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+            margin-bottom: 20px;
+        }
+
+        .beat-info h3 {
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .beat-info p {
+            color: #888;
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+
+        .beat-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .tag {
+            padding: 6px 12px;
+            background: rgba(255, 20, 106, 0.15);
+            border-radius: 20px;
+            font-size: 12px;
+            color: #ff7ab8;
+        }
+
+        .beat-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .beat-actions button {
+            flex: 1;
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .play-btn {
+            background: linear-gradient(135deg, #ff146a, #ff7ab8);
+            color: #fff;
+        }
+
+        .play-btn:hover {
+            transform: scale(1.02);
+        }
+
+        .add-btn {
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .add-btn:hover {
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(155, 89, 182, 0.2);
+            border-top-color: #9b59b6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: rgba(30, 30, 50, 0.4);
+            border-radius: 20px;
+            border: 1px dashed rgba(255, 255, 255, 0.1);
+        }
+
+        .empty-state .icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        .empty-state h3 {
+            color: #888;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .ai-box {
+                padding: 24px;
+            }
+
+            .beat-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="floating-notes" id="floatingNotes"></div>
+
+    <header>
+        <a href="{{ url_for('index') }}" class="logo"><span class="f">F</span><span class="on">ON</span><span class="ix">IX</span></a>
+        <div class="nav-links">
+            <a href="{{ url_for('index') }}">🏠 Keşfet</a>
+            <a href="{{ url_for('beats_page') }}">🎹 Beatler</a>
+            <a href="{{ url_for('studio') }}">🎙️ Stüdyo</a>
+            <a href="{{ url_for('lyrics_page') }}">✍️ Söz Yaz</a>
+            <a href="{{ url_for('top_page') }}">🏆 Top 10</a>
+            {% if current_user %}
+            <a href="{{ url_for('profile') }}">👤 {{ current_user }}</a>
+            <a href="{{ url_for('logout') }}">🚪 Çıkış</a>
+            {% else %}
+            <a href="{{ url_for('login') }}">🔐 Giriş</a>
+            {% endif %}
+        </div>
+    </header>
+
+    <main>
+        <div class="page-header">
+            <h1>🤖 AI Beat Önerileri</h1>
+            <p>Şarkı sözlerinizi yapay zeka ile analiz edin, size en uygun beatleri bulalım!</p>
+        </div>
+
+        <!-- AI Analysis Box -->
+        <div class="ai-box">
+            <div class="ai-header">
+                <div class="ai-icon">🧠</div>
+                <div>
+                    <h2>Söz Analizi</h2>
+                    <p>Sözlerinizi yazın, AI duygu ve tema analizi yaparak en uygun beatleri önersin</p>
+                </div>
+            </div>
+
+            <div class="lyrics-input-area">
+                <textarea id="lyricsInput" placeholder="Şarkı sözlerinizi buraya yazın veya yapıştırın...
+
+Örnek:
+Gece karanlık, yıldızlar parlak
+Her adımda hatıralar takip ediyor
+Sokaklar sessiz, ben yine ayaktayım
+Hayaller peşimde, kaçamıyorum..."></textarea>
+            </div>
+
+            <button class="btn btn-ai" onclick="analyzeAndRecommend()">
+                🔮 Analiz Et & Beat Öner
+            </button>
+
+            <!-- Loading -->
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Sözleriniz analiz ediliyor...</p>
+            </div>
+
+            <!-- Analysis Result -->
+            <div class="analysis-result" id="analysisResult">
+                <h3 style="margin-bottom: 20px;">📊 Analiz Sonuçları</h3>
+                <div class="analysis-grid">
+                    <div class="analysis-item">
+                        <div class="label">Duygu</div>
+                        <div class="value" id="moodResult">-</div>
+                    </div>
+                    <div class="analysis-item">
+                        <div class="label">Tema</div>
+                        <div class="value" id="themeResult">-</div>
+                    </div>
+                    <div class="analysis-item">
+                        <div class="label">Önerilen Tür</div>
+                        <div class="value" id="genreResult">-</div>
+                    </div>
+                    <div class="analysis-item">
+                        <div class="label">Enerji</div>
+                        <div class="value" id="energyResult">-</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recommendations -->
+        <div class="recommendations-section" id="recommendationsSection" style="display: none;">
+            <h2 class="section-title">🎵 Size Önerilen Beatler</h2>
+            <div class="beat-grid" id="recommendedBeats"></div>
+        </div>
+
+        <!-- Default Recommendations -->
+        {% if recommended_beats %}
+        <div class="recommendations-section">
+            <h2 class="section-title">⭐ Popüler Öneriler</h2>
+            <div class="beat-grid">
+                {% for beat in recommended_beats %}
+                <div class="beat-card">
+                    <div class="beat-cover" style="background: {{ beat.cover_color if beat.cover_color else 'linear-gradient(135deg, #ff146a, #9b59b6)' }};">
+                        🎵
+                    </div>
+                    <div class="beat-info">
+                        <h3>{{ beat.name }}</h3>
+                        <p>{{ beat.artist }} • {{ beat.bpm if beat.bpm else '~' }} BPM</p>
+                    </div>
+                    <div class="beat-tags">
+                        <span class="tag">{{ beat.genre }}</span>
+                        {% if beat.mood %}<span class="tag">{{ beat.mood }}</span>{% endif %}
+                    </div>
+                    <div class="beat-actions">
+                        <button class="play-btn" onclick="playBeat('{{ beat.url }}', '{{ beat.name }}')">▶ Çal</button>
+                        <button class="add-btn" onclick="addToPlaylist({{ beat.id }})">➕</button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="icon">🎵</div>
+            <h3>Henüz öneri yok</h3>
+            <p>Şarkı sözlerinizi yukarıya yazarak kişiselleştirilmiş beat önerileri alın!</p>
+        </div>
+        {% endif %}
+    </main>
+
+    <audio id="audioPlayer"></audio>
+
+    <script>
+        function analyzeAndRecommend() {
+            const lyrics = document.getElementById('lyricsInput').value.trim();
+            
+            if (!lyrics || lyrics.length < 20) {
+                alert('Lütfen en az birkaç satır söz yazın.');
+                return;
+            }
+
+            document.getElementById('loading').classList.add('show');
+            document.getElementById('analysisResult').classList.remove('show');
+            document.getElementById('recommendationsSection').style.display = 'none';
+
+            fetch('/api/beat-recommend', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ lyrics: lyrics })
+            })
+            .then(r => r.json())
+            .then(data => {
+                document.getElementById('loading').classList.remove('show');
+
+                if (data.analysis) {
+                    document.getElementById('moodResult').textContent = data.analysis.mood || '-';
+                    document.getElementById('themeResult').textContent = data.analysis.theme || '-';
+                    document.getElementById('genreResult').textContent = data.analysis.genre || '-';
+                    document.getElementById('energyResult').textContent = data.analysis.energy || '-';
+                    document.getElementById('analysisResult').classList.add('show');
+                }
+
+                if (data.beats && data.beats.length > 0) {
+                    renderRecommendations(data.beats);
+                    document.getElementById('recommendationsSection').style.display = 'block';
+                }
+            })
+            .catch(err => {
+                document.getElementById('loading').classList.remove('show');
+                alert('Bir hata oluştu. Lütfen tekrar deneyin.');
+            });
+        }
+
+        function renderRecommendations(beats) {
+            const container = document.getElementById('recommendedBeats');
+            container.innerHTML = '';
+
+            beats.forEach((beat, index) => {
+                const score = Math.max(95 - (index * 5), 70);
+                const card = document.createElement('div');
+                card.className = 'beat-card';
+                card.innerHTML = `
+                    <div class="match-score">${score}% Uyum</div>
+                    <div class="beat-cover" style="background: ${beat.cover_color || 'linear-gradient(135deg, #ff146a, #9b59b6)'};">
+                        🎵
+                    </div>
+                    <div class="beat-info">
+                        <h3>${beat.name}</h3>
+                        <p>${beat.artist} • ${beat.bpm || '~'} BPM</p>
+                    </div>
+                    <div class="beat-tags">
+                        <span class="tag">${beat.genre}</span>
+                        ${beat.mood ? `<span class="tag">${beat.mood}</span>` : ''}
+                    </div>
+                    <div class="beat-actions">
+                        <button class="play-btn" onclick="playBeat('${beat.url}', '${beat.name}')">▶ Çal</button>
+                        <button class="add-btn" onclick="addToPlaylist(${beat.id})">➕</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function playBeat(url, name) {
+            if (!url) {
+                alert('Bu beat için ses dosyası mevcut değil.');
+                return;
+            }
+            const audio = document.getElementById('audioPlayer');
+            audio.src = url;
+            audio.play();
+        }
+
+        function addToPlaylist(beatId) {
+            fetch('/api/playlist/add', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ beat_id: beatId })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Beat playlist\'e eklendi! 🎵');
+                } else {
+                    alert(data.error || 'Bir hata oluştu.');
+                }
+            });
+        }
+
+        // Floating notes
+        const notes = ['♪', '♫', '♬', '🎵', '🎶'];
+        const container = document.getElementById('floatingNotes');
+
+        function createNote() {
+            const note = document.createElement('div');
+            note.className = 'note';
+            note.textContent = notes[Math.floor(Math.random() * notes.length)];
+            note.style.left = Math.random() * 100 + '%';
+            note.style.animationDuration = (15 + Math.random() * 20) + 's';
+            container.appendChild(note);
+            setTimeout(() => note.remove(), 35000);
+        }
+
+        for (let i = 0; i < 10; i++) setTimeout(createNote, i * 400);
+        setInterval(createNote, 2500);
+    </script>
+</body>
+
+</html>

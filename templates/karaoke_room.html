@@ -1,0 +1,1489 @@
+<!DOCTYPE html>
+<html lang="tr" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.0/socket.io.min.js"></script>
+    <style>
+        :root {
+            /* Dark Theme (Default) */
+            --bg-primary: #0f0f1a;
+            --bg-secondary: #1a1a2e;
+            --bg-tertiary: #16213e;
+            --bg-card: rgba(30, 30, 50, 0.8);
+            --text-primary: #f5f5ff;
+            --text-secondary: #a0a0b8;
+            --text-muted: #666;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --border-hover: rgba(255, 122, 184, 0.3);
+            --accent: #ff146a;
+            --accent-light: #ff7ab8;
+            --sidebar-bg: rgba(20, 20, 35, 0.95);
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #f5f5f7;
+            --bg-secondary: #e8e8ed;
+            --bg-tertiary: #ffffff;
+            --bg-card: rgba(255, 255, 255, 0.9);
+            --text-primary: #1a1a2e;
+            --text-secondary: #5a5a6e;
+            --text-muted: #888;
+            --border-color: rgba(0, 0, 0, 0.1);
+            --border-hover: rgba(255, 20, 106, 0.4);
+            --sidebar-bg: rgba(255, 255, 255, 0.98);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, var(--bg-tertiary) 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            transition: all 0.3s ease;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        /* Header */
+        header {
+            height: 70px;
+            background: rgba(255, 20, 106, 0.95);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 30px rgba(255, 20, 106, 0.3);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-family: 'Times New Roman', Georgia, serif;
+            font-size: 32px;
+            font-weight: bold;
+            text-decoration: none;
+            background: white;
+            padding: 6px 14px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .logo .f { color: #4AADE8; }
+        .logo .on { color: #333; }
+        .logo .ix { color: #E63946; }
+
+        .room-header-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .room-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .room-code {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #fff;
+        }
+
+        .room-code:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(20deg);
+        }
+
+        /* Main Layout */
+        main {
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 0;
+            height: calc(100vh - 70px);
+        }
+
+        /* Center Area */
+        .stage-area {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow-y: auto;
+        }
+
+        /* Lyrics Display - Karaoke Style */
+        .lyrics-display {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 0;
+            height: 300px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .lyrics-header {
+            background: linear-gradient(135deg, var(--accent), var(--accent-light));
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .lyrics-header h2 {
+            font-size: 16px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .song-info-header {
+            text-align: right;
+            color: #fff;
+        }
+
+        .song-title-header {
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .song-artist-header {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .lyrics-container {
+            height: calc(100% - 60px);
+            overflow: hidden;
+            position: relative;
+            background: linear-gradient(180deg, 
+                var(--bg-card) 0%, 
+                transparent 15%, 
+                transparent 85%, 
+                var(--bg-card) 100%
+            );
+        }
+
+        .lyrics-scroll {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            padding: 60px 40px;
+            transition: transform 0.3s ease-out;
+        }
+
+        .lyric-line {
+            font-size: 24px;
+            font-weight: 600;
+            line-height: 2.2;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+            opacity: 0.4;
+        }
+
+        .lyric-line.active {
+            font-size: 32px;
+            color: var(--accent);
+            opacity: 1;
+            text-shadow: 0 0 20px rgba(255, 20, 106, 0.5);
+        }
+
+        .lyric-line.chorus {
+            color: var(--accent-light);
+        }
+
+        .lyric-line.active.chorus {
+            color: #fff;
+            background: linear-gradient(135deg, var(--accent), var(--accent-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Beat Player */
+        .beat-player {
+            background: linear-gradient(135deg, rgba(255, 20, 106, 0.15) 0%, rgba(255, 122, 184, 0.08) 100%);
+            border: 1px solid rgba(255, 122, 184, 0.2);
+            border-radius: 20px;
+            padding: 24px;
+        }
+
+        .beat-player-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .beat-player-header h2 {
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .now-playing {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .beat-cover {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-light));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            box-shadow: 0 8px 30px rgba(255, 20, 106, 0.3);
+        }
+
+        .beat-details {
+            flex: 1;
+        }
+
+        .beat-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .beat-artist {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .audio-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        [data-theme="light"] .progress-bar {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--accent-light));
+            border-radius: 3px;
+            width: 0%;
+            transition: width 0.1s;
+        }
+
+        .control-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .time-display {
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-family: monospace;
+        }
+
+        .control-buttons {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .play-btn {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-light));
+            border: none;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 20px rgba(255, 20, 106, 0.4);
+        }
+
+        .play-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .play-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Song Selector */
+        .song-selector {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 20px;
+            flex: 1;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .song-selector h3 {
+            font-size: 16px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .songs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .song-option {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        [data-theme="light"] .song-option {
+            background: rgba(0, 0, 0, 0.02);
+        }
+
+        .song-option:hover {
+            background: rgba(255, 122, 184, 0.1);
+            border-color: var(--border-hover);
+            transform: translateY(-2px);
+        }
+
+        .song-option.selected {
+            background: rgba(255, 20, 106, 0.15);
+            border-color: var(--accent);
+        }
+
+        .song-option.playing {
+            border-color: var(--accent);
+            box-shadow: 0 0 20px rgba(255, 20, 106, 0.2);
+        }
+
+        .song-cover {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #333, #666);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .song-meta {
+            flex: 1;
+        }
+
+        .song-name {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .song-artist-name {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .song-rating {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+            color: #ffd700;
+        }
+
+        /* Rating Modal */
+        .rating-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            display: none;
+        }
+
+        .rating-section.show {
+            display: block;
+        }
+
+        .rating-section h3 {
+            font-size: 16px;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .stars-container {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .star-btn {
+            background: none;
+            border: none;
+            font-size: 32px;
+            cursor: pointer;
+            transition: all 0.2s;
+            opacity: 0.3;
+        }
+
+        .star-btn:hover,
+        .star-btn.active {
+            opacity: 1;
+            transform: scale(1.2);
+        }
+
+        .submit-rating-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-light));
+            border: none;
+            border-radius: 10px;
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .submit-rating-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Sidebar - Chat & Participants */
+        .sidebar {
+            background: var(--sidebar-bg);
+            border-left: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .sidebar-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .sidebar-tab {
+            flex: 1;
+            padding: 14px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+        }
+
+        .sidebar-tab.active {
+            color: var(--accent);
+            border-bottom: 2px solid var(--accent);
+        }
+
+        .sidebar-content {
+            flex: 1;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tab-panel {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .tab-panel.active {
+            display: flex;
+        }
+
+        /* Participants Panel */
+        .participants-list {
+            padding: 16px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .participant-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            background: rgba(255, 255, 255, 0.03);
+            transition: all 0.3s;
+        }
+
+        [data-theme="light"] .participant-item {
+            background: rgba(0, 0, 0, 0.03);
+        }
+
+        .participant-item.host {
+            background: rgba(255, 20, 106, 0.1);
+        }
+
+        .participant-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .participant-info {
+            flex: 1;
+        }
+
+        .participant-name {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .participant-badge {
+            font-size: 11px;
+            color: var(--accent);
+        }
+
+        /* Chat Panel */
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .chat-message {
+            display: flex;
+            gap: 10px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .chat-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .chat-content {
+            flex: 1;
+        }
+
+        .chat-username {
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .chat-text {
+            font-size: 13px;
+            color: var(--text-secondary);
+            word-break: break-word;
+        }
+
+        .system-message {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 12px;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+        }
+
+        [data-theme="light"] .system-message {
+            background: rgba(0, 0, 0, 0.03);
+        }
+
+        .chat-input-area {
+            padding: 16px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .chat-input-form {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 10px 14px;
+            color: var(--text-primary);
+            font-size: 13px;
+        }
+
+        [data-theme="light"] .chat-input {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .chat-send-btn {
+            background: linear-gradient(135deg, var(--accent), var(--accent-light));
+            border: none;
+            border-radius: 10px;
+            padding: 10px 16px;
+            color: #fff;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .chat-send-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-danger {
+            background: rgba(255, 59, 48, 0.2);
+            color: #ff3b30;
+            border: 1px solid rgba(255, 59, 48, 0.3);
+        }
+
+        .btn-danger:hover {
+            background: rgba(255, 59, 48, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            main {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                position: fixed;
+                right: -320px;
+                top: 70px;
+                width: 320px;
+                height: calc(100vh - 70px);
+                transition: right 0.3s ease;
+                z-index: 50;
+            }
+
+            .sidebar.open {
+                right: 0;
+            }
+
+            .lyrics-display {
+                height: 250px;
+            }
+
+            .lyric-line {
+                font-size: 18px;
+            }
+
+            .lyric-line.active {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <a href="{{ url_for('index') }}" class="logo"><span class="f">F</span><span class="on">ON</span><span class="ix">IX</span></a>
+        <div class="room-header-info">
+            <span class="room-title">{{ room.name }}</span>
+            <span class="room-code" onclick="copyRoomCode()" title="Kodu kopyala">🔗 {{ room.room_code }}</span>
+        </div>
+        <div class="header-actions">
+            <button class="theme-toggle" onclick="toggleTheme()" title="Tema Değiştir">🌓</button>
+            <a href="{{ url_for('karaoke_lobby') }}" class="btn btn-secondary" id="leaveBtn">🚪 Ayrıl</a>
+            {% if is_host %}
+            <form action="{{ url_for('close_karaoke_room', room_code=room.room_code) }}" method="POST" style="display: inline;">
+                <button type="submit" class="btn btn-danger" onclick="return confirm('Odayı kapatmak istediğinize emin misiniz?')">❌ Kapat</button>
+            </form>
+            {% endif %}
+        </div>
+    </header>
+
+    <main>
+        <div class="stage-area">
+            <!-- Lyrics Display (Karaoke Style) -->
+            <div class="lyrics-display">
+                <div class="lyrics-header">
+                    <h2>🎤 Şarkı Sözleri</h2>
+                    <div class="song-info-header">
+                        <div class="song-title-header" id="lyricsTitle">Şarkı Seçin</div>
+                        <div class="song-artist-header" id="lyricsArtist">-</div>
+                    </div>
+                </div>
+                <div class="lyrics-container">
+                    <div class="lyrics-scroll" id="lyricsScroll">
+                        <div class="lyric-line">Bir şarkı seçin...</div>
+                        <div class="lyric-line">Sözler burada görünecek</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Beat Player -->
+            <div class="beat-player">
+                <div class="beat-player-header">
+                    <h2>🎵 Çalan Şarkı</h2>
+                </div>
+
+                <div class="now-playing">
+                    <div class="beat-cover" id="beatCover">🎶</div>
+                    <div class="beat-details">
+                        <div class="beat-title" id="beatTitle">Şarkı seçilmedi</div>
+                        <div class="beat-artist" id="beatArtist">Host bir şarkı seçsin</div>
+                    </div>
+                </div>
+
+                <div class="audio-controls">
+                    <div class="progress-bar" id="progressBar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div class="control-row">
+                        <span class="time-display"><span id="currentTime">0:00</span> / <span id="totalTime">0:00</span></span>
+                        <div class="control-buttons">
+                            <button class="play-btn" id="playBtn" {% if not is_host %}disabled{% endif %}>▶️</button>
+                        </div>
+                    </div>
+                </div>
+
+                <audio id="audioPlayer"></audio>
+            </div>
+
+            <!-- Song Selector -->
+            <div class="song-selector">
+                <h3>🎵 Şarkı Listesi {% if is_host %}(Seçim Yapabilirsin){% endif %}</h3>
+                <div class="songs-grid" id="songsGrid">
+                    <!-- Songs will be populated here -->
+                </div>
+            </div>
+
+            <!-- Rating Section (Shows after song ends) -->
+            <div class="rating-section" id="ratingSection">
+                <h3>⭐ Bu performansı puanla!</h3>
+                <div class="stars-container" id="starsContainer">
+                    <button class="star-btn" data-rating="1">⭐</button>
+                    <button class="star-btn" data-rating="2">⭐</button>
+                    <button class="star-btn" data-rating="3">⭐</button>
+                    <button class="star-btn" data-rating="4">⭐</button>
+                    <button class="star-btn" data-rating="5">⭐</button>
+                </div>
+                <button class="submit-rating-btn" id="submitRating">Puanı Gönder</button>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-tabs">
+                <button class="sidebar-tab active" data-tab="chat">💬 Sohbet</button>
+                <button class="sidebar-tab" data-tab="participants">👥 Katılımcılar</button>
+            </div>
+
+            <div class="sidebar-content">
+                <!-- Chat Panel -->
+                <div class="tab-panel active" id="chatPanel">
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="system-message">🎤 Karaoke odasına hoş geldin!</div>
+                    </div>
+                    <div class="chat-input-area">
+                        <form class="chat-input-form" id="chatForm">
+                            <input type="text" class="chat-input" id="chatInput" placeholder="Mesaj yaz..." autocomplete="off">
+                            <button type="submit" class="chat-send-btn">➤</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Participants Panel -->
+                <div class="tab-panel" id="participantsPanel">
+                    <div class="participants-list" id="participantsList">
+                        <!-- Participants will be added here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Room data
+        const roomCode = '{{ room.room_code }}';
+        const userId = {{ user_id }};
+        const username = '{{ current_user }}';
+        const isHost = {{ 'true' if is_host else 'false' }};
+        const hostId = {{ room.host_id }};
+
+        // Karaoke Şarkıları (Orijinal sözlerle)
+        const songs = [
+            {
+                id: 1,
+                title: "Yıldızların Altında",
+                artist: "FONIX",
+                cover: "🌟",
+                url: "/static/beats/beat_chill.mp3",
+                lyrics: [
+                    { time: 0, text: "♪ Müzik Başlıyor ♪" },
+                    { time: 5, text: "Yıldızların altında yürüyorum" },
+                    { time: 10, text: "Gece rüzgarı saçlarımda" },
+                    { time: 15, text: "Seni düşünüyorum her an" },
+                    { time: 20, text: "Kalbim seninle çarpıyor" },
+                    { time: 25, text: "Bu gece farklı bir gece" },
+                    { time: 30, text: "Hayallerim seninle dolu" },
+                    { time: 35, text: "Yıldızların altında bekleyeceğim" },
+                    { time: 40, text: "Sen gelene kadar buradayım" },
+                    { time: 45, text: "♪ ♪ ♪" }
+                ],
+                rating: 4.8
+            },
+            {
+                id: 3,
+                title: "Sokak Işıkları",
+                artist: "FONIX",
+                cover: "🏙️",
+                url: "/static/beats/beat_hiphop.mp3",
+                lyrics: [
+                    { time: 0, text: "♪ Beat düşüyor ♪" },
+                    { time: 4, text: "Sokak ışıkları parlıyor" },
+                    { time: 8, text: "Gece hayatı başlıyor" },
+                    { time: 12, text: "Adımlarım yankılanıyor" },
+                    { time: 16, text: "Bu şehrin her köşesini biliyorum" },
+                    { time: 20, text: "Burası benim evim" },
+                    { time: 24, text: "Sokaklar konuşuyor benimle" },
+                    { time: 28, text: "Her duvar bir hikaye anlatıyor" },
+                    { time: 32, text: "Gece bitmeden dans et" },
+                    { time: 36, text: "♪ ♪ ♪" }
+                ],
+                rating: 4.7
+            },
+            {
+                id: 4,
+                title: "Deniz Kenarı",
+                artist: "FONIX",
+                cover: "🌊",
+                url: "/static/beats/beat_ambient.mp3",
+                lyrics: [
+                    { time: 0, text: "♪ Dalgalar ♪" },
+                    { time: 5, text: "Deniz kenarında oturuyorum" },
+                    { time: 10, text: "Dalgalar ayaklarıma vuruyor" },
+                    { time: 15, text: "Güneş batıyor ufukta" },
+                    { time: 20, text: "Huzur buluyorum burada" },
+                    { time: 25, text: "Tüm dertlerim gidiyor" },
+                    { time: 30, text: "Sadece deniz ve ben" },
+                    { time: 35, text: "Bu an sonsuza kadar sürsün" },
+                    { time: 40, text: "♪ ♪ ♪" }
+                ],
+                rating: 4.5
+            },
+            {
+                id: 5,
+                title: "Dans Et Benimle",
+                artist: "FONIX",
+                cover: "💃",
+                url: "/static/beats/beat_electronic.mp3",
+                lyrics: [
+                    { time: 0, text: "♪ Elektronik ritimler ♪" },
+                    { time: 4, text: "Gel dans et benimle" },
+                    { time: 8, text: "Müzik ruhumuzu sarsın" },
+                    { time: 12, text: "Bu gece eğlenelim" },
+                    { time: 16, text: "Eller havaya kaldır" },
+                    { time: 20, text: "Ritme kendini bırak" },
+                    { time: 24, text: "Dans et benimle bu gece" },
+                    { time: 28, text: "Sabaha kadar devam" },
+                    { time: 32, text: "Müzik bizim dilimiz!" },
+                    { time: 36, text: "♪ ♪ ♪" }
+                ],
+                rating: 4.9
+            },
+            {
+                id: 6,
+                title: "Gece Yarısı",
+                artist: "FONIX",
+                cover: "🌙",
+                url: "/static/beats/beat_jazz.mp3",
+                lyrics: [
+                    { time: 0, text: "♪ Caz melodisi ♪" },
+                    { time: 5, text: "Gece yarısı uyanıyorum" },
+                    { time: 10, text: "Yıldızlar pencereden bakıyor" },
+                    { time: 15, text: "Sessizlik konuşuyor" },
+                    { time: 20, text: "Düşüncelerim derinlerde" },
+                    { time: 25, text: "Bu gece farklı hissediyorum" },
+                    { time: 30, text: "Ruhum özgür geziyor" },
+                    { time: 35, text: "Gece yarısının büyüsü" },
+                    { time: 40, text: "♪ ♪ ♪" }
+                ],
+                rating: 4.4
+            }
+        ];
+
+        // beats değişkenini songs olarak kullan (eski kod uyumluluğu)
+        const beats = songs;
+
+        // Current state
+        let currentSong = null;
+        let isPlaying = false;
+        let selectedRating = 0;
+
+        // Socket.IO connection
+        const socket = io();
+
+        // Audio player
+        const audioPlayer = document.getElementById('audioPlayer');
+        const playBtn = document.getElementById('playBtn');
+        const progressBar = document.getElementById('progressBar');
+        const progressFill = document.getElementById('progressFill');
+        const currentTimeEl = document.getElementById('currentTime');
+        const totalTimeEl = document.getElementById('totalTime');
+
+        // Initialize songs grid
+        function initSongsGrid() {
+            const grid = document.getElementById('songsGrid');
+            grid.innerHTML = '';
+
+            songs.forEach(song => {
+                const songEl = document.createElement('div');
+                songEl.className = 'song-option';
+                songEl.dataset.songId = song.id;
+                songEl.innerHTML = `
+                    <div class="song-cover">${song.cover}</div>
+                    <div class="song-meta">
+                        <div class="song-name">${song.title}</div>
+                        <div class="song-artist-name">${song.artist}</div>
+                    </div>
+                    <div class="song-rating">⭐ ${song.rating}</div>
+                `;
+
+                if (isHost) {
+                    songEl.addEventListener('click', () => selectSong(song.id));
+                }
+
+                grid.appendChild(songEl);
+            });
+        }
+
+        // Select song (Host only)
+        function selectSong(songId) {
+            if (!isHost) return;
+
+            const song = songs.find(s => s.id === songId);
+            if (!song) return;
+
+            socket.emit('select_song', {
+                room_code: roomCode,
+                song_id: songId,
+                user_id: userId
+            });
+
+            updateCurrentSong(song);
+        }
+
+        // Update current song
+        function updateCurrentSong(song) {
+            currentSong = song;
+            currentLyricIndex = 0;
+
+            // Update UI
+            document.getElementById('beatTitle').textContent = song.title;
+            document.getElementById('beatArtist').textContent = song.artist;
+            document.getElementById('beatCover').textContent = song.cover;
+            document.getElementById('lyricsTitle').textContent = song.title;
+            document.getElementById('lyricsArtist').textContent = song.artist;
+
+            // Load audio
+            if (song.url) {
+                audioPlayer.src = song.url;
+                audioPlayer.load();
+            }
+
+            // Update selection UI
+            document.querySelectorAll('.song-option').forEach(el => {
+                el.classList.remove('selected', 'playing');
+                if (el.dataset.songId == song.id) {
+                    el.classList.add('selected');
+                }
+            });
+
+            // Show lyrics
+            updateLyricsDisplay();
+        }
+
+        // Update lyrics display - show song lyrics
+        function updateLyricsDisplay() {
+            if (!currentSong || !currentSong.lyrics) return;
+
+            const scroll = document.getElementById('lyricsScroll');
+            scroll.innerHTML = '';
+
+            currentSong.lyrics.forEach((lyric, index) => {
+                const lineEl = document.createElement('div');
+                lineEl.className = 'lyric-line';
+                lineEl.dataset.index = index;
+                lineEl.textContent = lyric.text;
+                scroll.appendChild(lineEl);
+            });
+
+            highlightCurrentLyric(0);
+        }
+
+        // Highlight current lyric
+        let currentLyricIndex = 0;
+        function highlightCurrentLyric(index) {
+            const lines = document.querySelectorAll('.lyric-line');
+            lines.forEach((line, i) => {
+                line.classList.remove('active');
+                if (i === index) {
+                    line.classList.add('active');
+                }
+            });
+
+            // Scroll to current lyric
+            const scroll = document.getElementById('lyricsScroll');
+            const activeLine = lines[index];
+            if (activeLine) {
+                const offset = activeLine.offsetTop - 80;
+                scroll.style.transform = `translateY(-${offset}px)`;
+            }
+        }
+
+        // Sync lyrics with audio
+        function syncLyricsWithAudio() {
+            if (!currentSong || !currentSong.lyrics) return;
+
+            const currentTime = audioPlayer.currentTime;
+
+            // Find current lyric
+            for (let i = currentSong.lyrics.length - 1; i >= 0; i--) {
+                if (currentTime >= currentSong.lyrics[i].time) {
+                    if (i !== currentLyricIndex) {
+                        currentLyricIndex = i;
+                        highlightCurrentLyric(i);
+                    }
+                    break;
+                }
+            }
+        }
+
+        // Audio event listeners
+        audioPlayer.addEventListener('timeupdate', () => {
+            // Update progress bar
+            if (audioPlayer.duration) {
+                const progress = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+                progressFill.style.width = progress + '%';
+                currentTimeEl.textContent = formatTime(audioPlayer.currentTime);
+            }
+
+            // Sync lyrics
+            syncLyricsWithAudio();
+        });
+
+        audioPlayer.addEventListener('loadedmetadata', () => {
+            totalTimeEl.textContent = formatTime(audioPlayer.duration);
+        });
+
+        audioPlayer.addEventListener('ended', () => {
+            isPlaying = false;
+            playBtn.textContent = '▶️';
+            document.querySelectorAll('.song-option').forEach(el => {
+                el.classList.remove('playing');
+            });
+            showRatingSection();
+        });
+
+        // Start playing with real audio
+        function startPlaying() {
+            if (!currentSong || !audioPlayer.src) return;
+
+            audioPlayer.play().then(() => {
+                isPlaying = true;
+                playBtn.textContent = '⏸️';
+                
+                const selectedSongEl = document.querySelector(`.song-option[data-song-id="${currentSong.id}"]`);
+                if (selectedSongEl) selectedSongEl.classList.add('playing');
+
+                // Emit to room
+                socket.emit('play_pause', {
+                    room_code: roomCode,
+                    is_playing: true,
+                    current_time: audioPlayer.currentTime,
+                    user_id: userId
+                });
+            }).catch(err => {
+                console.error('Audio play failed:', err);
+                addSystemMessage('⚠️ Ses çalınamadı. Tarayıcı izni gerekebilir.');
+            });
+        }
+
+        function stopPlaying() {
+            audioPlayer.pause();
+            isPlaying = false;
+            playBtn.textContent = '▶️';
+
+            document.querySelectorAll('.song-option').forEach(el => {
+                el.classList.remove('playing');
+            });
+
+            socket.emit('play_pause', {
+                room_code: roomCode,
+                is_playing: false,
+                current_time: audioPlayer.currentTime,
+                user_id: userId
+            });
+        }
+
+        // Show rating section
+        function showRatingSection() {
+            document.getElementById('ratingSection').classList.add('show');
+            addSystemMessage('🎤 Şarkı bitti! Performansı puanla!');
+        }
+
+        // Play/Pause
+        if (isHost) {
+            playBtn.addEventListener('click', () => {
+                if (!currentSong) {
+                    alert('Önce bir şarkı seç!');
+                    return;
+                }
+
+                if (isPlaying) {
+                    stopPlaying();
+                } else {
+                    startPlaying();
+                }
+            });
+        }
+
+        // Rating system
+        document.querySelectorAll('.star-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                selectedRating = parseInt(btn.dataset.rating);
+                document.querySelectorAll('.star-btn').forEach((b, i) => {
+                    b.classList.toggle('active', i < selectedRating);
+                });
+            });
+        });
+
+        document.getElementById('submitRating').addEventListener('click', () => {
+            if (selectedRating > 0) {
+                socket.emit('submit_rating', {
+                    room_code: roomCode,
+                    user_id: userId,
+                    song_id: currentSong?.id,
+                    rating: selectedRating
+                });
+                addSystemMessage(`⭐ ${selectedRating} yıldız verdin!`);
+                document.getElementById('ratingSection').classList.remove('show');
+                selectedRating = 0;
+                document.querySelectorAll('.star-btn').forEach(b => b.classList.remove('active'));
+            }
+        });
+
+        // Progress bar seek (Host only)
+        if (isHost) {
+            progressBar.addEventListener('click', (e) => {
+                if (!audioPlayer.duration) return;
+                const rect = progressBar.getBoundingClientRect();
+                const percent = (e.clientX - rect.left) / rect.width;
+                audioPlayer.currentTime = percent * audioPlayer.duration;
+                
+                // Sync to room
+                socket.emit('sync_time', {
+                    room_code: roomCode,
+                    current_time: audioPlayer.currentTime
+                });
+            });
+        }
+
+        // Theme toggle
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.dataset.theme;
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.dataset.theme = newTheme;
+            localStorage.setItem('theme', newTheme);
+        }
+
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.dataset.theme = savedTheme;
+
+        // Sidebar tabs
+        document.querySelectorAll('.sidebar-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabName = tab.dataset.tab;
+                
+                document.querySelectorAll('.sidebar-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+                
+                tab.classList.add('active');
+                document.getElementById(tabName + 'Panel').classList.add('active');
+            });
+        });
+
+        // Socket event handlers
+        socket.emit('join_room', {
+            room_code: roomCode,
+            user_id: userId,
+            username: username
+        });
+
+        socket.on('user_joined', (data) => {
+            addSystemMessage(data.message);
+            updateParticipants(data.participants);
+        });
+
+        socket.on('user_left', (data) => {
+            addSystemMessage(data.message);
+        });
+
+        socket.on('room_state', (data) => {
+            updateParticipants(data.participants);
+        });
+
+        socket.on('song_changed', (data) => {
+            const song = songs.find(s => s.id === data.song_id);
+            if (song) {
+                updateCurrentSong(song);
+                addSystemMessage(`🎵 Şarkı değişti: ${song.title}`);
+            }
+        });
+
+        socket.on('playback_sync', (data) => {
+            if (!isHost && currentSong) {
+                audioPlayer.currentTime = data.current_time;
+                if (data.is_playing && !isPlaying) {
+                    audioPlayer.play().then(() => {
+                        isPlaying = true;
+                        playBtn.textContent = '⏸️';
+                    }).catch(err => console.log('Autoplay blocked'));
+                } else if (!data.is_playing && isPlaying) {
+                    audioPlayer.pause();
+                    isPlaying = false;
+                    playBtn.textContent = '▶️';
+                }
+            }
+        });
+
+        socket.on('new_message', (data) => {
+            addChatMessage(data);
+        });
+
+        socket.on('rating_received', (data) => {
+            addSystemMessage(`⭐ ${data.username} ${data.rating} yıldız verdi!`);
+        });
+
+        socket.on('room_closed', () => {
+            alert('Oda kapatıldı!');
+            window.location.href = '/karaoke';
+        });
+
+        // Chat
+        document.getElementById('chatForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            if (message) {
+                socket.emit('chat_message', {
+                    room_code: roomCode,
+                    user_id: userId,
+                    username: username,
+                    message: message
+                });
+                input.value = '';
+            }
+        });
+
+        // Helper functions
+        function updateParticipants(participants) {
+            const list = document.getElementById('participantsList');
+            list.innerHTML = '';
+
+            participants.forEach(p => {
+                const item = document.createElement('div');
+                item.className = 'participant-item' + (p.is_host ? ' host' : '');
+                item.innerHTML = `
+                    <div class="participant-avatar" style="background: ${p.avatar_color}">${p.username.charAt(0).toUpperCase()}</div>
+                    <div class="participant-info">
+                        <div class="participant-name">${p.username}</div>
+                        ${p.is_host ? '<div class="participant-badge">👑 Host</div>' : ''}
+                    </div>
+                `;
+                list.appendChild(item);
+            });
+        }
+
+        function addChatMessage(data) {
+            const container = document.getElementById('chatMessages');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'chat-message';
+            msgDiv.innerHTML = `
+                <div class="chat-avatar" style="background: ${data.avatar_color}">${data.username.charAt(0).toUpperCase()}</div>
+                <div class="chat-content">
+                    <div class="chat-username">${data.username}</div>
+                    <div class="chat-text">${escapeHtml(data.message)}</div>
+                </div>
+            `;
+            container.appendChild(msgDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function addSystemMessage(message) {
+            const container = document.getElementById('chatMessages');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'system-message';
+            msgDiv.textContent = message;
+            container.appendChild(msgDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function copyRoomCode() {
+            navigator.clipboard.writeText(roomCode);
+            addSystemMessage('📋 Oda kodu kopyalandı: ' + roomCode);
+        }
+
+        // Leave room
+        document.getElementById('leaveBtn').addEventListener('click', () => {
+            socket.emit('leave_room', {
+                room_code: roomCode,
+                user_id: userId,
+                username: username
+            });
+        });
+
+        // Initialize
+        initSongsGrid();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,2028 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FONIX — Kayıt Stüdyosu</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%);
+            color: #f5f5ff;
+            min-height: 100vh;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        /* Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            background: rgba(15, 15, 26, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-family: 'Times New Roman', Georgia, serif;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .logo .f { color: #4AADE8; }
+        .logo .on { color: #ffffff; text-shadow: 0 0 2px rgba(0,0,0,0.3); }
+        .logo .ix { color: #E63946; }
+
+        nav {
+            display: flex;
+            gap: 32px;
+        }
+
+        nav a {
+            font-size: 14px;
+            font-weight: 500;
+            opacity: 0.7;
+            transition: all 0.3s;
+        }
+
+        nav a:hover,
+        nav a.active {
+            opacity: 1;
+            color: #ff7ab8;
+        }
+
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff146a, #ff7ab8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+        /* Main Content */
+        main {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+
+        .page-title {
+            font-size: 36px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #fff 0%, #ff7ab8 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .page-subtitle {
+            color: #888;
+            font-size: 16px;
+            margin-bottom: 40px;
+        }
+
+        /* Studio Layout */
+        .studio-container {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 30px;
+        }
+
+        /* Beat Selection Panel */
+        .beat-panel {
+            background: rgba(30, 30, 50, 0.6);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 24px;
+            height: fit-content;
+        }
+
+        .panel-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .beat-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .beat-item {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .beat-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .beat-item.selected {
+            border-color: #ff146a;
+            background: rgba(255, 20, 106, 0.1);
+        }
+
+        .beat-item-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .beat-item-info {
+            font-size: 12px;
+            color: #888;
+        }
+
+        /* Recording Studio */
+        .studio-main {
+            background: rgba(30, 30, 50, 0.6);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 30px;
+        }
+
+        /* Waveform Display */
+        .waveform-container {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 16px;
+            height: 200px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .waveform-placeholder {
+            color: #555;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        #waveformCanvas {
+            width: 100%;
+            height: 100%;
+        }
+
+        .time-display {
+            position: absolute;
+            bottom: 10px;
+            right: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 24px;
+            font-weight: bold;
+            color: #ff146a;
+        }
+
+        .recording-indicator {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .recording-indicator.active {
+            opacity: 1;
+        }
+
+        .rec-dot {
+            width: 12px;
+            height: 12px;
+            background: #ff0000;
+            border-radius: 50%;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        /* Controls */
+        .controls-section {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .main-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .control-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            font-size: 24px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .control-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .btn-play {
+            background: linear-gradient(135deg, #4AADE8, #2196F3);
+            color: white;
+        }
+
+        .btn-record {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #ff146a, #E63946);
+            color: white;
+            font-size: 32px;
+        }
+
+        .btn-record.recording {
+            animation: recordPulse 1s infinite;
+        }
+
+        @keyframes recordPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 20, 106, 0.7); }
+            50% { box-shadow: 0 0 0 20px rgba(255, 20, 106, 0); }
+        }
+
+        .btn-stop {
+            background: linear-gradient(135deg, #6c757d, #495057);
+            color: white;
+        }
+
+        /* Volume Controls */
+        .volume-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .volume-group {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .volume-label {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .volume-slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            -webkit-appearance: none;
+            background: rgba(255, 255, 255, 0.1);
+            outline: none;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #ff146a;
+            cursor: pointer;
+        }
+        
+        /* Monitor Button */
+        .monitor-btn {
+            padding: 10px 20px;
+            border-radius: 10px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.3);
+            color: #888;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .monitor-btn:hover {
+            border-color: #22c55e;
+            color: #22c55e;
+        }
+        
+        .monitor-btn.active {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            border-color: #22c55e;
+            color: white;
+        }
+
+        /* Recordings List */
+        .recordings-section {
+            margin-top: 30px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .recordings-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .recording-item {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .recording-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .recording-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #ff146a, #ff7ab8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .recording-name {
+            font-weight: 600;
+        }
+
+        .recording-duration {
+            font-size: 12px;
+            color: #888;
+        }
+
+        .recording-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-small-play {
+            background: rgba(74, 173, 232, 0.2);
+            color: #4AADE8;
+        }
+
+        .btn-download {
+            background: rgba(40, 167, 69, 0.2);
+            color: #28a745;
+        }
+
+        .btn-delete {
+            background: rgba(220, 53, 69, 0.2);
+            color: #dc3545;
+        }
+
+        /* Empty State */
+        .empty-recordings {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        /* Microphone Permission */
+        .mic-permission {
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .mic-permission.show {
+            display: block;
+        }
+
+        .mic-permission h3 {
+            color: #ffc107;
+            margin-bottom: 8px;
+        }
+
+        .mic-permission p {
+            font-size: 14px;
+            color: #888;
+        }
+
+        /* Effects Panel */
+        .effects-panel {
+            background: rgba(30, 30, 50, 0.6);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 24px;
+            margin-top: 30px;
+        }
+
+        .effects-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, #fff 0%, #ff7ab8 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .effects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .effect-card {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s;
+        }
+
+        .effect-card:hover {
+            border-color: rgba(255, 20, 106, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .effect-card.active {
+            border-color: #ff146a;
+            box-shadow: 0 0 20px rgba(255, 20, 106, 0.2);
+        }
+
+        .effect-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .effect-name {
+            font-size: 16px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .effect-toggle {
+            width: 50px;
+            height: 26px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 13px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .effect-toggle.on {
+            background: linear-gradient(135deg, #ff146a, #ff7ab8);
+        }
+
+        .effect-toggle::after {
+            content: '';
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s;
+        }
+
+        .effect-toggle.on::after {
+            left: 26px;
+        }
+
+        .effect-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .effect-control {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .effect-control-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .effect-control label {
+            font-size: 12px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .effect-control-value {
+            font-size: 12px;
+            font-weight: 600;
+            color: #ff7ab8;
+        }
+
+        .effect-slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            -webkit-appearance: none;
+            background: rgba(255, 255, 255, 0.1);
+            outline: none;
+        }
+
+        .effect-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff146a, #ff7ab8);
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(255, 20, 106, 0.4);
+        }
+
+        .effect-preset-btns {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .preset-btn {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            color: #888;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .preset-btn:hover {
+            border-color: #ff146a;
+            color: #fff;
+        }
+
+        .preset-btn.active {
+            background: rgba(255, 20, 106, 0.2);
+            border-color: #ff146a;
+            color: #ff7ab8;
+        }
+
+        /* Autotune Special */
+        .autotune-key-select {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .key-btn {
+            width: 36px;
+            height: 32px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            color: #888;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .key-btn:hover {
+            border-color: #ff146a;
+            color: #fff;
+        }
+
+        .key-btn.active {
+            background: linear-gradient(135deg, #ff146a, #ff7ab8);
+            border-color: #ff146a;
+            color: white;
+        }
+
+        /* EQ Visualizer */
+        .eq-visualizer {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            height: 60px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 8px;
+            margin-bottom: 12px;
+        }
+
+        .eq-band {
+            width: 8%;
+            background: linear-gradient(to top, #ff146a, #ff7ab8);
+            border-radius: 2px;
+            transition: height 0.2s;
+        }
+
+        /* Master Section */
+        .master-section {
+            background: linear-gradient(135deg, rgba(255, 20, 106, 0.1), rgba(255, 122, 184, 0.05));
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 20px;
+            border: 1px solid rgba(255, 20, 106, 0.2);
+        }
+
+        .master-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .master-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #ff7ab8;
+        }
+
+        .master-meter {
+            display: flex;
+            gap: 4px;
+            align-items: flex-end;
+            height: 30px;
+        }
+
+        .meter-bar {
+            width: 4px;
+            background: linear-gradient(to top, #22c55e, #fbbf24, #ef4444);
+            border-radius: 2px;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .studio-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            header {
+                padding: 15px 20px;
+            }
+
+            nav {
+                display: none;
+            }
+
+            main {
+                padding: 20px;
+            }
+
+            .volume-controls {
+                grid-template-columns: 1fr;
+            }
+
+            .effects-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <a href="{{ url_for('index') }}" class="logo">
+            <span class="f">F</span><span class="on">ON</span><span class="ix">IX</span>
+        </a>
+
+        <nav>
+            <a href="{{ url_for('index') }}">Keşfet</a>
+            <a href="{{ url_for('beats_page') }}">Beatler</a>
+            <a href="{{ url_for('studio') }}" class="active">🎙️ Stüdyo</a>
+            <a href="{{ url_for('mixer_page') }}">🎛️ Mixer</a>
+            <a href="{{ url_for('lyrics_page') }}">Şarkı Yaz</a>
+            <a href="{{ url_for('top_page') }}">Top 10</a>
+        </nav>
+
+        <div class="user-section">
+            {% if current_user %}
+            <a href="{{ url_for('profile') }}" class="user-avatar">{{ current_user[0]|upper }}</a>
+            {% else %}
+            <a href="{{ url_for('login') }}" class="user-avatar">?</a>
+            {% endif %}
+        </div>
+    </header>
+
+    <main>
+        <h1 class="page-title">🎙️ Kayıt Stüdyosu</h1>
+        <p class="page-subtitle">Beat seç, mikrofonu aç ve şarkını kaydet!</p>
+
+        <div class="mic-permission" id="micPermission">
+            <h3>🎤 Mikrofon İzni Gerekli</h3>
+            <p>Kayıt yapabilmek için tarayıcıdan mikrofon iznini onaylamanız gerekiyor.</p>
+        </div>
+
+        <div class="studio-container">
+            <!-- Beat Selection -->
+            <div class="beat-panel">
+                <h2 class="panel-title">🎵 Beat Seç</h2>
+                <div class="beat-list" id="beatList">
+                    {% for beat in beats %}
+                    <div class="beat-item" data-beat-id="{{ beat.id }}" data-beat-name="{{ beat.name }}" data-beat-bpm="{{ beat.bpm }}" data-beat-url="{{ beat.url }}">
+                        <div class="beat-item-name">{{ beat.name }}</div>
+                        <div class="beat-item-info">{{ beat.genre }} • {{ beat.bpm }} BPM</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Recording Studio -->
+            <div class="studio-main">
+                <div class="waveform-container">
+                    <canvas id="waveformCanvas"></canvas>
+                    <div class="recording-indicator" id="recordingIndicator">
+                        <div class="rec-dot"></div>
+                        <span style="color: #ff0000; font-weight: bold;">KAYIT</span>
+                    </div>
+                    <div class="time-display" id="timeDisplay">00:00</div>
+                </div>
+
+                <div class="controls-section">
+                    <!-- Selected Beat Info -->
+                    <div style="text-align: center; margin-bottom: 10px;">
+                        <span id="selectedBeatName" style="color: #888;">Beat seçilmedi</span>
+                    </div>
+
+                    <!-- Main Controls -->
+                    <div class="main-controls">
+                        <button class="control-btn btn-play" id="btnPlay" title="Beat Çal/Durdur">
+                            ▶️
+                        </button>
+                        <button class="control-btn btn-record" id="btnRecord" title="Kayıt Başlat">
+                            🎤
+                        </button>
+                        <button class="control-btn btn-stop" id="btnStop" title="Durdur">
+                            ⏹️
+                        </button>
+                    </div>
+
+                    <!-- Volume Controls -->
+                    <div class="volume-controls">
+                        <div class="volume-group">
+                            <label class="volume-label">🎵 Beat Ses Seviyesi</label>
+                            <input type="range" class="volume-slider" id="beatVolume" min="0" max="100" value="70">
+                        </div>
+                        <div class="volume-group">
+                            <label class="volume-label">🎤 Mikrofon Seviyesi</label>
+                            <input type="range" class="volume-slider" id="micVolume" min="0" max="100" value="100">
+                        </div>
+                        <div class="volume-group">
+                            <button class="monitor-btn" id="monitorBtn" onclick="toggleMonitor()" title="Kulaklıktan kendini duy">
+                                🎧 Monitor
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recordings -->
+                <div class="recordings-section">
+                    <h3 class="section-title">📁 Kayıtlarım</h3>
+                    <div class="recordings-list" id="recordingsList">
+                        <div class="empty-recordings">
+                            <p>Henüz kayıt yok. Bir beat seç ve kayda başla!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ses Efektleri Paneli -->
+        <div class="effects-panel">
+            <h2 class="effects-title">🎚️ Ses Efektleri (Gerçek Zamanlı)</h2>
+            <p style="color: #888; font-size: 12px; margin-bottom: 20px;">
+                ✨ Efektleri aç ve kayıt yaparken sesine anında uygula! Monitor butonuyla kendini duyabilirsin.
+            </p>
+            
+            <div class="effects-grid">
+                <!-- REVERB -->
+                <div class="effect-card" id="reverbCard">
+                    <div class="effect-header">
+                        <span class="effect-name">🏛️ Reverb</span>
+                        <div class="effect-toggle" id="reverbToggle" onclick="toggleEffect('reverb')"></div>
+                    </div>
+                    <div class="effect-controls">
+                        <div class="effect-control">
+                            <div class="effect-control-header">
+                                <label>Room Size</label>
+                                <span class="effect-control-value" id="reverbRoomValue">50%</span>
+                            </div>
+                            <input type="range" class="effect-slider" id="reverbRoom" min="0" max="100" value="50" oninput="updateEffect('reverb', 'room', this.value)">
+                        </div>
+                        <div class="effect-control">
+                            <div class="effect-control-header">
+                                <label>Decay</label>
+                                <span class="effect-control-value" id="reverbDecayValue">40%</span>
+                            </div>
+                            <input type="range" class="effect-slider" id="reverbDecay" min="0" max="100" value="40" oninput="updateEffect('reverb', 'decay', this.value)">
+                        </div>
+                        <div class="effect-control">
+                            <div class="effect-control-header">
+                                <label>Mix (Dry/Wet)</label>
+                                <span class="effect-control-value" id="reverbMixValue">30%</span>
+                            </div>
+                            <input type="range" class="effect-slider" id="reverbMix" min="0" max="100" value="30" oninput="updateEffect('reverb', 'mix', this.value)">
+                        </div>
+                        <div class="effect-preset-btns">
+                            <button class="preset-btn" onclick="setReverbPreset('room')">Oda</button>
+                            <button class="preset-btn" onclick="setReverbPreset('hall')">Salon</button>
+                            <button class="preset-btn" onclick="setReverbPreset('church')">Kilise</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DELAY -->
+                <div class="effect-card" id="delayCard">
+                    <div class="effect-header">
+                        <span class="effect-name">🔄 Delay / Echo</span>
+                        <div class="effect-toggle" id="delayToggle" onclick="toggleEffect('delay')"></div>
+                    </div>
+                    <div class="effect-controls">
+                        <div class="effect-control">
+                            <div class="effect-control-header">
+                                <label>Time (ms)</label>
+                                <span class="effect-control-value" id="delayTimeValue">300ms</span>
+                            </div>
+                            <input type="range" class="effect-slider" id="delayTime" min="50" max="1000" value="300" oninput="updateEffect('delay', 'time', this.value)">
+                        </div>
+                        <div class="effect-control">
+                            <div class="effect-control-header">
+                                <label>Feedback</label>
+                                <span class="effect-control-value" id="delayFeedbackValue">40%</span>
+                            </div>
+                            <input type="range" class="effect-slider" id="delayFeedback" min="0" max="90" value="40" oninput="updateEffect('delay', 'feedback', this.value)">
+                        </div>
+                        <div class="effect-control">
+                            <div class="effect-control-header">
+                                <label>Mix</label>
+                                <span class="effect-control-value" id="delayMixValue">25%</span>
+                            </div>
+                            <input type="range" class="effect-slider" id="delayMix" min="0" max="100" value="25" oninput="updateEffect('delay', 'mix', this.value)">
+                        </div>
+                        <div class="effect-preset-btns">
+                            <button class="preset-btn" onclick="setDelayPreset('slapback')">Slapback</button>
+                            <button class="preset-btn" onclick="setDelayPreset('doubling')">Doubling</button>
+                            <button class="preset-btn" onclick="setDelayPreset('long')">Uzun Echo</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AUTOTUNE / PITCH CORRECTION -->
+                <div class="effect-card" id="autotuneCard">
+                    <div class="effect-header">
+                        <span class="effect-name">🎵 Autotune</span>
+                        <div class="effect-toggle" id="autotuneToggle" onclick="toggleEffect('autotune')"></div>
+                    </div>
+                    <div class="effect-controls">
+                        <div class="effect-control">
+                            <div class="effect-control-header">
+                                <label>Correction Speed</label>
+                                <span class="effect-control-value" id="autotuneSpeedValue">Orta</span>
+                            </div>
+                            <input type="range" class="effect-slider" id="autotuneSpeed" min="0" max="100" value="50" oninput="updateEffect('autotune', 'speed', this.value)">
+                        </div>
+                        <div class="effect-control">
+                            <label style="margin-bottom: 4px;">Anahtar (Key)</label>
+                            <div class="autotune-key-select">
+                                <button class="key-btn active" onclick="setAutotuneKey('C')">C</button>
+                                <button class="key-btn" onclick="setAutotuneKey('C#')">C#</button>
+                                <button class="key-btn" onclick="setAutotuneKey('D')">D</button>
+                                <button class="key-btn" onclick="setAutotuneKey('D#')">D#</button>
+                                <button class="key-btn" onclick="setAutotuneKey('E')">E</button>
+                                <button class="key-btn" onclick="setAutotuneKey('F')">F</button>
+                                <button class="key-btn" onclick="setAutotuneKey('F#')">F#</button>
+                                <button class="key-btn" onclick="setAutotuneKey('G')">G</button>
+                                <button class="key-btn" onclick="setAutotuneKey('G#')">G#</button>
+                                <button class="key-btn" onclick="setAutotuneKey('A')">A</button>
+                                <button class="key-btn" onclick="setAutotuneKey('A#')">A#</button>
+                                <button class="key-btn" onclick="setAutotuneKey('B')">B</button>
+                            </div>
+                        </div>
+                        <div class="effect-preset-btns">
+                            <button class="preset-btn" onclick="setAutotunePreset('natural')">Doğal</button>
+                            <button class="preset-btn" onclick="setAutotunePreset('tpain')">T-Pain</button>
+                            <button class="preset-btn" onclick="setAutotunePreset('robot')">Robot</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- COMPRESSOR -->
+                <div class="effect-card" id="compressorCard">
+                    <div class="effect-header">
+                        <span class="effect-name">📊 Compressor</span>
+                        <div class="effect-toggle" id="compressorToggle" onclick="toggleEffect('compressor')"></div>
+                    </div>
+                    <div class="effect-controls">
+                        <div class="effect-control">
+                            <div class="effect-control-header">
+                                <label>Threshold</label>
+                                <span class="effect-control-value" id="compThresholdValue">-24dB</span>
+                            </div>
+                            <input type="range" class="effect-slider" id="compThreshold" min="-60" max="0" value="-24" oninput="updateEffect('compressor', 'threshold', this.value)">
+                        </div>
+                        <div class="effect-control">
+                            <div class="effect-control-header">
+                                <label>Ratio</label>
+                                <span class="effect-control-value" id="compRatioValue">4:1</span>
+                            </div>
+                            <input type="range" class="effect-slider" id="compRatio" min="1" max="20" value="4" oninput="updateEffect('compressor', 'ratio', this.value)">
+                        </div>
+                        <div class="effect-control">
+                            <div class="effect-control-header">
+                                <label>Makeup Gain</label>
+                                <span class="effect-control-value" id="compGainValue">+6dB</span>
+                            </div>
+                            <input type="range" class="effect-slider" id="compGain" min="0" max="24" value="6" oninput="updateEffect('compressor', 'gain', this.value)">
+                        </div>
+                        <div class="effect-preset-btns">
+                            <button class="preset-btn" onclick="setCompPreset('vocal')">Vokal</button>
+                            <button class="preset-btn" onclick="setCompPreset('punch')">Punch</button>
+                            <button class="preset-btn" onclick="setCompPreset('limit')">Limiter</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- EQ -->
+                <div class="effect-card" id="eqCard">
+                    <div class="effect-header">
+                        <span class="effect-name">🎛️ Equalizer</span>
+                        <div class="effect-toggle" id="eqToggle" onclick="toggleEffect('eq')"></div>
+                    </div>
+                    <div class="effect-controls">
+                        <div class="eq-visualizer" id="eqVisualizer">
+                            <div class="eq-band" style="height: 40%;" data-band="0"></div>
+                            <div class="eq-band" style="height: 50%;" data-band="1"></div>
+                            <div class="eq-band" style="height: 60%;" data-band="2"></div>
+                            <div class="eq-band" style="height: 70%;" data-band="3"></div>
+                            <div class="eq-band" style="height: 80%;" data-band="4"></div>
+                            <div class="eq-band" style="height: 70%;" data-band="5"></div>
+                            <div class="eq-band" style="height: 60%;" data-band="6"></div>
+                            <div class="eq-band" style="height: 50%;" data-band="7"></div>
+                        </div>
+                        <div class="effect-control">
+                            <div class="effect-control-header">
+                                <label>Bass (60Hz)</label>
+                                <span class="effect-control-value" id="eqBassValue">0dB</span>
+                            </div>
+                            <input type="range" class="effect-slider" id="eqBass" min="-12" max="12" value="0" oninput="updateEffect('eq', 'bass', this.value)">
+                        </div>
+                        <div class="effect-control">
+                            <div class="effect-control-header">
+                                <label>Mid (1kHz)</label>
+                                <span class="effect-control-value" id="eqMidValue">0dB</span>
+                            </div>
+                            <input type="range" class="effect-slider" id="eqMid" min="-12" max="12" value="0" oninput="updateEffect('eq', 'mid', this.value)">
+                        </div>
+                        <div class="effect-control">
+                            <div class="effect-control-header">
+                                <label>Treble (8kHz)</label>
+                                <span class="effect-control-value" id="eqTrebleValue">0dB</span>
+                            </div>
+                            <input type="range" class="effect-slider" id="eqTreble" min="-12" max="12" value="0" oninput="updateEffect('eq', 'treble', this.value)">
+                        </div>
+                        <div class="effect-preset-btns">
+                            <button class="preset-btn" onclick="setEqPreset('flat')">Flat</button>
+                            <button class="preset-btn" onclick="setEqPreset('warm')">Warm</button>
+                            <button class="preset-btn" onclick="setEqPreset('bright')">Bright</button>
+                            <button class="preset-btn" onclick="setEqPreset('radio')">Radio</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DISTORTION / SATURATION -->
+                <div class="effect-card" id="distortionCard">
+                    <div class="effect-header">
+                        <span class="effect-name">🔥 Distortion</span>
+                        <div class="effect-toggle" id="distortionToggle" onclick="toggleEffect('distortion')"></div>
+                    </div>
+                    <div class="effect-controls">
+                        <div class="effect-control">
+                            <div class="effect-control-header">
+                                <label>Drive</label>
+                                <span class="effect-control-value" id="distDriveValue">30%</span>
+                            </div>
+                            <input type="range" class="effect-slider" id="distDrive" min="0" max="100" value="30" oninput="updateEffect('distortion', 'drive', this.value)">
+                        </div>
+                        <div class="effect-control">
+                            <div class="effect-control-header">
+                                <label>Tone</label>
+                                <span class="effect-control-value" id="distToneValue">50%</span>
+                            </div>
+                            <input type="range" class="effect-slider" id="distTone" min="0" max="100" value="50" oninput="updateEffect('distortion', 'tone', this.value)">
+                        </div>
+                        <div class="effect-control">
+                            <div class="effect-control-header">
+                                <label>Mix</label>
+                                <span class="effect-control-value" id="distMixValue">20%</span>
+                            </div>
+                            <input type="range" class="effect-slider" id="distMix" min="0" max="100" value="20" oninput="updateEffect('distortion', 'mix', this.value)">
+                        </div>
+                        <div class="effect-preset-btns">
+                            <button class="preset-btn" onclick="setDistPreset('warm')">Warm</button>
+                            <button class="preset-btn" onclick="setDistPreset('crunch')">Crunch</button>
+                            <button class="preset-btn" onclick="setDistPreset('heavy')">Heavy</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Master Section -->
+            <div class="master-section">
+                <div class="master-header">
+                    <span class="master-title">🎚️ MASTER OUTPUT</span>
+                    <div class="master-meter" id="masterMeter">
+                        <div class="meter-bar" style="height: 60%;"></div>
+                        <div class="meter-bar" style="height: 70%;"></div>
+                        <div class="meter-bar" style="height: 80%;"></div>
+                        <div class="meter-bar" style="height: 90%;"></div>
+                        <div class="meter-bar" style="height: 85%;"></div>
+                        <div class="meter-bar" style="height: 75%;"></div>
+                        <div class="meter-bar" style="height: 65%;"></div>
+                        <div class="meter-bar" style="height: 55%;"></div>
+                    </div>
+                </div>
+                <div class="effect-controls" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+                    <div class="effect-control">
+                        <div class="effect-control-header">
+                            <label>Master Volume</label>
+                            <span class="effect-control-value" id="masterVolValue">80%</span>
+                        </div>
+                        <input type="range" class="effect-slider" id="masterVol" min="0" max="100" value="80" oninput="updateMaster('volume', this.value)">
+                    </div>
+                    <div class="effect-control">
+                        <div class="effect-control-header">
+                            <label>Stereo Width</label>
+                            <span class="effect-control-value" id="stereoWidthValue">100%</span>
+                        </div>
+                        <input type="range" class="effect-slider" id="stereoWidth" min="0" max="200" value="100" oninput="updateMaster('width', this.value)">
+                    </div>
+                    <div class="effect-control">
+                        <div class="effect-control-header">
+                            <label>Output Limiter</label>
+                            <span class="effect-control-value" id="limiterValue">-0.5dB</span>
+                        </div>
+                        <input type="range" class="effect-slider" id="limiter" min="-6" max="0" value="-0.5" step="0.1" oninput="updateMaster('limiter', this.value)">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Ses değişkenleri
+        let audioContext;
+        let mediaRecorder;
+        let audioChunks = [];
+        let beatAudio = new Audio();
+        let isRecording = false;
+        let isPlaying = false;
+        let recordingStartTime;
+        let timerInterval;
+        let recordings = [];
+        let selectedBeatId = null;
+        let analyser;
+        let dataArray;
+        let animationId;
+        
+        // Efekt node'ları
+        let micSource;
+        let micGain;
+        let reverbNode;
+        let delayNode;
+        let delayFeedback;
+        let compressorNode;
+        let eqLow, eqMid, eqHigh;
+        let distortionNode;
+        let masterGain;
+        let effectsDestination;
+        let monitorGain;
+
+        // Canvas
+        const canvas = document.getElementById('waveformCanvas');
+        const canvasCtx = canvas.getContext('2d');
+
+        // Elemanlar
+        const btnPlay = document.getElementById('btnPlay');
+        const btnRecord = document.getElementById('btnRecord');
+        const btnStop = document.getElementById('btnStop');
+        const timeDisplay = document.getElementById('timeDisplay');
+        const recordingIndicator = document.getElementById('recordingIndicator');
+        const selectedBeatName = document.getElementById('selectedBeatName');
+        const beatVolume = document.getElementById('beatVolume');
+        const micVolume = document.getElementById('micVolume');
+        const micPermission = document.getElementById('micPermission');
+
+        // Canvas boyutunu ayarla
+        function resizeCanvas() {
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        // Beat seçimi
+        document.querySelectorAll('.beat-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.beat-item').forEach(i => i.classList.remove('selected'));
+                this.classList.add('selected');
+                
+                selectedBeatId = this.dataset.beatId;
+                const beatName = this.dataset.beatName;
+                const beatBpm = this.dataset.beatBpm;
+                const beatUrl = this.dataset.beatUrl;
+                
+                selectedBeatName.innerHTML = `<strong>${beatName}</strong> - ${beatBpm} BPM`;
+                selectedBeatName.style.color = '#ff7ab8';
+                
+                // Beat URL'ini yükle
+                if (beatUrl) {
+                    beatAudio.src = beatUrl;
+                    beatAudio.load();
+                    console.log('Beat yüklendi:', beatUrl);
+                }
+            });
+        });
+
+        // Mikrofon erişimi ve efekt zinciri kurulumu
+        async function initAudio() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    audio: {
+                        echoCancellation: false,
+                        noiseSuppression: false,
+                        autoGainControl: false
+                    }
+                });
+                
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // Mikrofon kaynağı
+                micSource = audioContext.createMediaStreamSource(stream);
+                
+                // Mikrofon gain (ses seviyesi)
+                micGain = audioContext.createGain();
+                micGain.gain.value = 1;
+                
+                // ============================================
+                // EFEKTLERİ OLUŞTUR
+                // ============================================
+                
+                // 1. EQ (3 band)
+                eqLow = audioContext.createBiquadFilter();
+                eqLow.type = 'lowshelf';
+                eqLow.frequency.value = 320;
+                eqLow.gain.value = 0;
+                
+                eqMid = audioContext.createBiquadFilter();
+                eqMid.type = 'peaking';
+                eqMid.frequency.value = 1000;
+                eqMid.Q.value = 0.5;
+                eqMid.gain.value = 0;
+                
+                eqHigh = audioContext.createBiquadFilter();
+                eqHigh.type = 'highshelf';
+                eqHigh.frequency.value = 3200;
+                eqHigh.gain.value = 0;
+                
+                // 2. Compressor
+                compressorNode = audioContext.createDynamicsCompressor();
+                compressorNode.threshold.value = -24;
+                compressorNode.knee.value = 30;
+                compressorNode.ratio.value = 4;
+                compressorNode.attack.value = 0.003;
+                compressorNode.release.value = 0.25;
+                
+                // 3. Distortion
+                distortionNode = audioContext.createWaveShaper();
+                distortionNode.curve = makeDistortionCurve(0);
+                distortionNode.oversample = '4x';
+                
+                // 4. Delay
+                delayNode = audioContext.createDelay(2.0);
+                delayNode.delayTime.value = 0.3;
+                delayFeedback = audioContext.createGain();
+                delayFeedback.gain.value = 0;
+                
+                // 5. Reverb (ConvolverNode)
+                reverbNode = audioContext.createConvolver();
+                await createReverbImpulse(0.5, 2);
+                
+                // Dry/Wet için gain node'ları
+                const dryGain = audioContext.createGain();
+                dryGain.gain.value = 1;
+                
+                const wetGain = audioContext.createGain();
+                wetGain.gain.value = 0;
+                
+                const delayWetGain = audioContext.createGain();
+                delayWetGain.gain.value = 0;
+                
+                // Master gain
+                masterGain = audioContext.createGain();
+                masterGain.gain.value = 0.8;
+                
+                // Monitor (kulaklıktan duyma)
+                monitorGain = audioContext.createGain();
+                monitorGain.gain.value = 0; // Başlangıçta kapalı (feedback önlemek için)
+                
+                // Analyser
+                analyser = audioContext.createAnalyser();
+                analyser.fftSize = 2048;
+                const bufferLength = analyser.frequencyBinCount;
+                dataArray = new Uint8Array(bufferLength);
+                
+                // ============================================
+                // EFEKTLERİ KAYIT İÇİN ZİNCİRLE
+                // ============================================
+                
+                // Efektli sinyal için MediaStreamDestination oluştur
+                effectsDestination = audioContext.createMediaStreamDestination();
+                
+                // Zincir: Mic -> Gain -> EQ -> Compressor -> Distortion -> Delay -> Reverb -> Master -> Destination
+                micSource.connect(micGain);
+                
+                // EQ zinciri
+                micGain.connect(eqLow);
+                eqLow.connect(eqMid);
+                eqMid.connect(eqHigh);
+                
+                // Compressor
+                eqHigh.connect(compressorNode);
+                
+                // Distortion (dry/wet mix)
+                compressorNode.connect(dryGain);
+                compressorNode.connect(distortionNode);
+                distortionNode.connect(wetGain);
+                
+                // Delay
+                dryGain.connect(delayNode);
+                wetGain.connect(delayNode);
+                delayNode.connect(delayFeedback);
+                delayFeedback.connect(delayNode); // Feedback loop
+                delayNode.connect(delayWetGain);
+                
+                // Master'a bağla
+                dryGain.connect(masterGain);
+                wetGain.connect(masterGain);
+                delayWetGain.connect(masterGain);
+                
+                // Reverb (ayrı bir hat)
+                const reverbSend = audioContext.createGain();
+                reverbSend.gain.value = 0;
+                masterGain.connect(reverbSend);
+                reverbSend.connect(reverbNode);
+                reverbNode.connect(effectsDestination);
+                
+                // Master çıkış
+                masterGain.connect(effectsDestination);
+                masterGain.connect(analyser);
+                
+                // Monitor (isteğe bağlı kulaklık çıkışı)
+                masterGain.connect(monitorGain);
+                monitorGain.connect(audioContext.destination);
+                
+                // Store references for effect updates
+                window.audioNodes = {
+                    micGain, eqLow, eqMid, eqHigh, compressorNode, 
+                    distortionNode, delayNode, delayFeedback, 
+                    reverbNode, masterGain, monitorGain,
+                    dryGain, wetGain, delayWetGain, reverbSend
+                };
+                
+                // ============================================
+                // KAYIT AYARI
+                // ============================================
+                
+                // MediaRecorder efektli sinyali kaydedecek
+                mediaRecorder = new MediaRecorder(effectsDestination.stream);
+                
+                mediaRecorder.ondataavailable = (e) => {
+                    audioChunks.push(e.data);
+                };
+                
+                mediaRecorder.onstop = () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                    saveRecording(audioBlob);
+                    audioChunks = [];
+                };
+                
+                micPermission.classList.remove('show');
+                drawWaveform();
+                
+                console.log('✅ Ses sistemi ve efektler hazır!');
+                
+            } catch (err) {
+                console.error('Mikrofon erişim hatası:', err);
+                micPermission.classList.add('show');
+            }
+        }
+        
+        // Reverb impulse response oluştur
+        async function createReverbImpulse(decay, duration) {
+            const sampleRate = audioContext.sampleRate;
+            const length = sampleRate * duration;
+            const impulse = audioContext.createBuffer(2, length, sampleRate);
+            
+            for (let channel = 0; channel < 2; channel++) {
+                const channelData = impulse.getChannelData(channel);
+                for (let i = 0; i < length; i++) {
+                    channelData[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / length, decay * 3);
+                }
+            }
+            
+            reverbNode.buffer = impulse;
+        }
+        
+        // Distortion curve oluştur
+        function makeDistortionCurve(amount) {
+            const k = amount;
+            const samples = 44100;
+            const curve = new Float32Array(samples);
+            const deg = Math.PI / 180;
+            
+            for (let i = 0; i < samples; i++) {
+                const x = (i * 2) / samples - 1;
+                curve[i] = ((3 + k) * x * 20 * deg) / (Math.PI + k * Math.abs(x));
+            }
+            return curve;
+        }
+
+        // Dalga formu çizimi
+        function drawWaveform() {
+            animationId = requestAnimationFrame(drawWaveform);
+            
+            if (!analyser) return;
+            
+            analyser.getByteTimeDomainData(dataArray);
+            
+            canvasCtx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+            canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            canvasCtx.lineWidth = 2;
+            canvasCtx.strokeStyle = isRecording ? '#ff146a' : '#4AADE8';
+            canvasCtx.beginPath();
+            
+            const sliceWidth = canvas.width / dataArray.length;
+            let x = 0;
+            
+            for (let i = 0; i < dataArray.length; i++) {
+                const v = dataArray[i] / 128.0;
+                const y = v * canvas.height / 2;
+                
+                if (i === 0) {
+                    canvasCtx.moveTo(x, y);
+                } else {
+                    canvasCtx.lineTo(x, y);
+                }
+                x += sliceWidth;
+            }
+            
+            canvasCtx.lineTo(canvas.width, canvas.height / 2);
+            canvasCtx.stroke();
+        }
+
+        // Kayıt başlat
+        function startRecording() {
+            if (!mediaRecorder) {
+                alert('Önce mikrofon izni vermelisiniz!');
+                initAudio();
+                return;
+            }
+            
+            if (isRecording) return;
+            
+            audioChunks = [];
+            mediaRecorder.start();
+            isRecording = true;
+            
+            btnRecord.classList.add('recording');
+            recordingIndicator.classList.add('active');
+            
+            recordingStartTime = Date.now();
+            timerInterval = setInterval(updateTimer, 100);
+            
+            // Beat'i de başlat
+            if (selectedBeatId && beatAudio.src) {
+                beatAudio.currentTime = 0;
+                beatAudio.play().then(() => {
+                    isPlaying = true;
+                    btnPlay.textContent = '⏸️';
+                }).catch(e => console.log('Beat auto-play engellendi:', e));
+            }
+        }
+
+        // Kayıt durdur
+        function stopRecording() {
+            if (!isRecording) return;
+            
+            mediaRecorder.stop();
+            isRecording = false;
+            
+            btnRecord.classList.remove('recording');
+            recordingIndicator.classList.remove('active');
+            
+            clearInterval(timerInterval);
+            
+            beatAudio.pause();
+            beatAudio.currentTime = 0;
+        }
+
+        // Zamanlayıcı güncelle
+        function updateTimer() {
+            const elapsed = Date.now() - recordingStartTime;
+            const minutes = Math.floor(elapsed / 60000);
+            const seconds = Math.floor((elapsed % 60000) / 1000);
+            timeDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+
+        // Kayıt kaydet
+        function saveRecording(blob) {
+            const recording = {
+                id: Date.now(),
+                name: `Kayıt ${recordings.length + 1}${selectedBeatId ? ' - Beat #' + selectedBeatId : ''}`,
+                blob: blob,
+                url: URL.createObjectURL(blob),
+                duration: timeDisplay.textContent,
+                date: new Date().toLocaleString('tr-TR')
+            };
+            
+            recordings.push(recording);
+            updateRecordingsList();
+            
+            // localStorage'a kaydet (mixer için)
+            saveRecordingToLocalStorage(recording, blob);
+            
+            timeDisplay.textContent = '00:00';
+        }
+        
+        // localStorage'a kaydet (base64 formatında)
+        async function saveRecordingToLocalStorage(recording, blob) {
+            try {
+                // Blob'u base64'e çevir
+                const reader = new FileReader();
+                reader.onloadend = function() {
+                    const base64data = reader.result;
+                    
+                    // Mevcut kayıtları al
+                    let savedRecordings = JSON.parse(localStorage.getItem('fonix_recordings') || '[]');
+                    
+                    // Yeni kaydı ekle
+                    savedRecordings.push({
+                        id: recording.id,
+                        name: recording.name,
+                        duration: recording.duration,
+                        date: recording.date,
+                        data: base64data
+                    });
+                    
+                    // Son 10 kaydı tut (localStorage limiti için)
+                    if (savedRecordings.length > 10) {
+                        savedRecordings = savedRecordings.slice(-10);
+                    }
+                    
+                    localStorage.setItem('fonix_recordings', JSON.stringify(savedRecordings));
+                    console.log('✅ Kayıt localStorage\'a kaydedildi:', recording.name);
+                };
+                reader.readAsDataURL(blob);
+            } catch (e) {
+                console.error('localStorage kayıt hatası:', e);
+            }
+        }
+
+        // Kayıt listesini güncelle
+        function updateRecordingsList() {
+            const list = document.getElementById('recordingsList');
+            
+            if (recordings.length === 0) {
+                list.innerHTML = '<div class="empty-recordings"><p>Henüz kayıt yok. Bir beat seç ve kayda başla!</p></div>';
+                return;
+            }
+            
+            list.innerHTML = recordings.map(rec => `
+                <div class="recording-item" data-id="${rec.id}">
+                    <div class="recording-info">
+                        <div class="recording-icon">🎵</div>
+                        <div>
+                            <div class="recording-name">${rec.name}</div>
+                            <div class="recording-duration">${rec.duration} • ${rec.date}</div>
+                        </div>
+                    </div>
+                    <div class="recording-actions">
+                        <button class="action-btn btn-small-play" onclick="playRecording(${rec.id})">▶️ Çal</button>
+                        <button class="action-btn btn-download" onclick="downloadRecording(${rec.id})">⬇️ İndir</button>
+                        <button class="action-btn btn-delete" onclick="deleteRecording(${rec.id})">🗑️</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Kayıt çal
+        function playRecording(id) {
+            const recording = recordings.find(r => r.id === id);
+            if (recording) {
+                const audio = new Audio(recording.url);
+                audio.play();
+            }
+        }
+
+        // Kayıt indir
+        function downloadRecording(id) {
+            const recording = recordings.find(r => r.id === id);
+            if (recording) {
+                const a = document.createElement('a');
+                a.href = recording.url;
+                a.download = `${recording.name.replace(/[^a-zA-Z0-9]/g, '_')}.wav`;
+                a.click();
+            }
+        }
+
+        // Kayıt sil
+        function deleteRecording(id) {
+            // Local array'den sil
+            recordings = recordings.filter(r => r.id !== id);
+            updateRecordingsList();
+            
+            // localStorage'dan da sil
+            try {
+                const savedRecordings = JSON.parse(localStorage.getItem('fonix_recordings') || '[]');
+                // String'e çevirerek karşılaştır (tip uyumsuzluğunu önle)
+                const updatedRecordings = savedRecordings.filter(rec => String(rec.id) !== String(id));
+                localStorage.setItem('fonix_recordings', JSON.stringify(updatedRecordings));
+                console.log('🗑️ Kayıt localStorage\'dan silindi:', id);
+            } catch (e) {
+                console.error('localStorage silme hatası:', e);
+            }
+        }
+
+        // Buton event'leri
+        btnRecord.addEventListener('click', () => {
+            if (isRecording) {
+                stopRecording();
+            } else {
+                startRecording();
+            }
+        });
+
+        btnStop.addEventListener('click', stopRecording);
+
+        btnPlay.addEventListener('click', () => {
+            if (!selectedBeatId) {
+                alert('Önce bir beat seçin!');
+                return;
+            }
+            
+            if (!beatAudio.src) {
+                alert('Beat dosyası bulunamadı!');
+                return;
+            }
+            
+            if (isPlaying) {
+                beatAudio.pause();
+                isPlaying = false;
+                btnPlay.textContent = '▶️';
+            } else {
+                beatAudio.play().then(() => {
+                    isPlaying = true;
+                    btnPlay.textContent = '⏸️';
+                }).catch(e => {
+                    console.error('Beat çalma hatası:', e);
+                    alert('Beat çalınamadı. Tekrar deneyin.');
+                });
+            }
+        });
+
+        // Ses seviyesi kontrolleri
+        beatVolume.addEventListener('input', (e) => {
+            beatAudio.volume = e.target.value / 100;
+        });
+        
+        // Mikrofon ses seviyesi kontrolü
+        micVolume.addEventListener('input', (e) => {
+            if (window.audioNodes && window.audioNodes.micGain) {
+                window.audioNodes.micGain.gain.value = e.target.value / 100;
+            }
+        });
+
+        // Beat bittiğinde
+        beatAudio.addEventListener('ended', () => {
+            isPlaying = false;
+            btnPlay.textContent = '▶️';
+        });
+
+        // Sayfa yüklendiğinde
+        window.addEventListener('load', () => {
+            initAudio();
+        });
+
+        // ============================================
+        // SES EFEKTLERİ SİSTEMİ
+        // ============================================
+        
+        // Efekt durumları
+        const effectsState = {
+            reverb: { active: false, room: 50, decay: 40, mix: 30 },
+            delay: { active: false, time: 300, feedback: 40, mix: 25 },
+            autotune: { active: false, speed: 50, key: 'C' },
+            compressor: { active: false, threshold: -24, ratio: 4, gain: 6 },
+            eq: { active: false, bass: 0, mid: 0, treble: 0 },
+            distortion: { active: false, drive: 30, tone: 50, mix: 20 }
+        };
+
+        // Efekt toggle
+        function toggleEffect(effectName) {
+            const toggle = document.getElementById(effectName + 'Toggle');
+            const card = document.getElementById(effectName + 'Card');
+            
+            effectsState[effectName].active = !effectsState[effectName].active;
+            
+            if (effectsState[effectName].active) {
+                toggle.classList.add('on');
+                card.classList.add('active');
+            } else {
+                toggle.classList.remove('on');
+                card.classList.remove('active');
+            }
+
+            applyEffects();
+        }
+
+        // Efekt güncelleme
+        function updateEffect(effectName, param, value) {
+            effectsState[effectName][param] = parseFloat(value);
+            
+            // UI güncelle
+            const valueDisplay = document.getElementById(effectName + param.charAt(0).toUpperCase() + param.slice(1) + 'Value');
+            if (valueDisplay) {
+                if (effectName === 'delay' && param === 'time') {
+                    valueDisplay.textContent = value + 'ms';
+                } else if (effectName === 'compressor' && param === 'threshold') {
+                    valueDisplay.textContent = value + 'dB';
+                } else if (effectName === 'compressor' && param === 'ratio') {
+                    valueDisplay.textContent = value + ':1';
+                } else if (effectName === 'compressor' && param === 'gain') {
+                    valueDisplay.textContent = '+' + value + 'dB';
+                } else if (effectName === 'eq') {
+                    valueDisplay.textContent = (value >= 0 ? '+' : '') + value + 'dB';
+                } else if (effectName === 'autotune' && param === 'speed') {
+                    const speeds = ['Yavaş', 'Orta-Yavaş', 'Orta', 'Orta-Hızlı', 'Hızlı'];
+                    valueDisplay.textContent = speeds[Math.floor(value / 25)];
+                } else {
+                    valueDisplay.textContent = value + '%';
+                }
+            }
+
+            applyEffects();
+        }
+
+        // Master kontrolleri
+        function updateMaster(param, value) {
+            if (param === 'volume') {
+                document.getElementById('masterVolValue').textContent = value + '%';
+                if (audioContext) {
+                    // Master volume ayarla
+                }
+            } else if (param === 'width') {
+                document.getElementById('stereoWidthValue').textContent = value + '%';
+            } else if (param === 'limiter') {
+                document.getElementById('limiterValue').textContent = value + 'dB';
+            }
+        }
+
+        // Efektleri uygula - GERÇEK ZAMANLI
+        function applyEffects() {
+            if (!audioContext || !window.audioNodes) return;
+
+            const nodes = window.audioNodes;
+            
+            // ============================================
+            // EQ EFEKTİ
+            // ============================================
+            if (effectsState.eq.active) {
+                nodes.eqLow.gain.value = effectsState.eq.bass;
+                nodes.eqMid.gain.value = effectsState.eq.mid;
+                nodes.eqHigh.gain.value = effectsState.eq.treble;
+            } else {
+                nodes.eqLow.gain.value = 0;
+                nodes.eqMid.gain.value = 0;
+                nodes.eqHigh.gain.value = 0;
+            }
+            
+            // ============================================
+            // COMPRESSOR EFEKTİ
+            // ============================================
+            if (effectsState.compressor.active) {
+                nodes.compressorNode.threshold.value = effectsState.compressor.threshold;
+                nodes.compressorNode.ratio.value = effectsState.compressor.ratio;
+                // Makeup gain için master gain'i ayarla
+                const makeupGain = 1 + (effectsState.compressor.gain / 20);
+                nodes.masterGain.gain.value = 0.8 * makeupGain;
+            } else {
+                nodes.compressorNode.threshold.value = 0;
+                nodes.compressorNode.ratio.value = 1;
+            }
+            
+            // ============================================
+            // DISTORTION EFEKTİ
+            // ============================================
+            if (effectsState.distortion.active) {
+                nodes.distortionNode.curve = makeDistortionCurve(effectsState.distortion.drive);
+                const wetAmount = effectsState.distortion.mix / 100;
+                nodes.dryGain.gain.value = 1 - wetAmount;
+                nodes.wetGain.gain.value = wetAmount;
+            } else {
+                nodes.distortionNode.curve = makeDistortionCurve(0);
+                nodes.dryGain.gain.value = 1;
+                nodes.wetGain.gain.value = 0;
+            }
+            
+            // ============================================
+            // DELAY EFEKTİ
+            // ============================================
+            if (effectsState.delay.active) {
+                nodes.delayNode.delayTime.value = effectsState.delay.time / 1000;
+                nodes.delayFeedback.gain.value = effectsState.delay.feedback / 100;
+                nodes.delayWetGain.gain.value = effectsState.delay.mix / 100;
+            } else {
+                nodes.delayFeedback.gain.value = 0;
+                nodes.delayWetGain.gain.value = 0;
+            }
+            
+            // ============================================
+            // REVERB EFEKTİ
+            // ============================================
+            if (effectsState.reverb.active) {
+                const decay = effectsState.reverb.decay / 100;
+                const roomSize = effectsState.reverb.room / 50;
+                createReverbImpulse(decay, roomSize * 3);
+                nodes.reverbSend.gain.value = effectsState.reverb.mix / 100;
+            } else {
+                nodes.reverbSend.gain.value = 0;
+            }
+            
+            // ============================================
+            // AUTOTUNE (basit pitch correction simülasyonu)
+            // ============================================
+            // Not: Gerçek autotune için daha karmaşık DSP gerekir
+            // Bu versiyonda görsel feedback vereceğiz
+            if (effectsState.autotune.active) {
+                // Autotune aktif göstergesi
+                console.log('🎤 Autotune aktif - Key:', effectsState.autotune.key, 'Speed:', effectsState.autotune.speed);
+            }
+
+            console.log('✅ Efektler uygulandı:', effectsState);
+        }
+        
+        // Monitor açma/kapama (kulaklıktan kendini duyma)
+        function toggleMonitor() {
+            if (!window.audioNodes) return;
+            
+            const currentValue = window.audioNodes.monitorGain.gain.value;
+            window.audioNodes.monitorGain.gain.value = currentValue > 0 ? 0 : 0.5;
+            
+            const btn = document.getElementById('monitorBtn');
+            if (btn) {
+                btn.classList.toggle('active', window.audioNodes.monitorGain.gain.value > 0);
+            }
+        }
+
+        // ============================================
+        // PRESET FONKSİYONLARI
+        // ============================================
+
+        // Reverb presetleri
+        function setReverbPreset(preset) {
+            const presets = {
+                room: { room: 30, decay: 20, mix: 25 },
+                hall: { room: 60, decay: 50, mix: 35 },
+                church: { room: 90, decay: 80, mix: 45 }
+            };
+            
+            if (presets[preset]) {
+                Object.keys(presets[preset]).forEach(key => {
+                    document.getElementById('reverb' + key.charAt(0).toUpperCase() + key.slice(1)).value = presets[preset][key];
+                    updateEffect('reverb', key, presets[preset][key]);
+                });
+            }
+        }
+
+        // Delay presetleri
+        function setDelayPreset(preset) {
+            const presets = {
+                slapback: { time: 80, feedback: 20, mix: 30 },
+                doubling: { time: 30, feedback: 10, mix: 40 },
+                long: { time: 500, feedback: 60, mix: 25 }
+            };
+            
+            if (presets[preset]) {
+                document.getElementById('delayTime').value = presets[preset].time;
+                document.getElementById('delayFeedback').value = presets[preset].feedback;
+                document.getElementById('delayMix').value = presets[preset].mix;
+                updateEffect('delay', 'time', presets[preset].time);
+                updateEffect('delay', 'feedback', presets[preset].feedback);
+                updateEffect('delay', 'mix', presets[preset].mix);
+            }
+        }
+
+        // Autotune key seçimi
+        function setAutotuneKey(key) {
+            effectsState.autotune.key = key;
+            document.querySelectorAll('.key-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            applyEffects();
+        }
+
+        // Autotune presetleri
+        function setAutotunePreset(preset) {
+            const presets = {
+                natural: { speed: 30 },
+                tpain: { speed: 100 },
+                robot: { speed: 100 }
+            };
+            
+            if (presets[preset]) {
+                document.getElementById('autotuneSpeed').value = presets[preset].speed;
+                updateEffect('autotune', 'speed', presets[preset].speed);
+            }
+        }
+
+        // Compressor presetleri
+        function setCompPreset(preset) {
+            const presets = {
+                vocal: { threshold: -18, ratio: 3, gain: 4 },
+                punch: { threshold: -12, ratio: 6, gain: 8 },
+                limit: { threshold: -6, ratio: 20, gain: 2 }
+            };
+            
+            if (presets[preset]) {
+                document.getElementById('compThreshold').value = presets[preset].threshold;
+                document.getElementById('compRatio').value = presets[preset].ratio;
+                document.getElementById('compGain').value = presets[preset].gain;
+                updateEffect('compressor', 'threshold', presets[preset].threshold);
+                updateEffect('compressor', 'ratio', presets[preset].ratio);
+                updateEffect('compressor', 'gain', presets[preset].gain);
+            }
+        }
+
+        // EQ presetleri
+        function setEqPreset(preset) {
+            const presets = {
+                flat: { bass: 0, mid: 0, treble: 0 },
+                warm: { bass: 4, mid: -2, treble: -3 },
+                bright: { bass: -2, mid: 2, treble: 5 },
+                radio: { bass: -6, mid: 4, treble: 6 }
+            };
+            
+            if (presets[preset]) {
+                document.getElementById('eqBass').value = presets[preset].bass;
+                document.getElementById('eqMid').value = presets[preset].mid;
+                document.getElementById('eqTreble').value = presets[preset].treble;
+                updateEffect('eq', 'bass', presets[preset].bass);
+                updateEffect('eq', 'mid', presets[preset].mid);
+                updateEffect('eq', 'treble', presets[preset].treble);
+                
+                // EQ visualizer güncelle
+                updateEqVisualizer(presets[preset]);
+            }
+        }
+
+        // EQ visualizer güncelle
+        function updateEqVisualizer(values) {
+            const bands = document.querySelectorAll('.eq-band');
+            const baseHeights = [40, 45, 50, 55, 55, 50, 45, 40];
+            
+            bands.forEach((band, i) => {
+                let modifier = 0;
+                if (i < 3) modifier = values.bass * 2;
+                else if (i < 5) modifier = values.mid * 2;
+                else modifier = values.treble * 2;
+                
+                band.style.height = Math.max(10, Math.min(100, baseHeights[i] + modifier)) + '%';
+            });
+        }
+
+        // Distortion presetleri
+        function setDistPreset(preset) {
+            const presets = {
+                warm: { drive: 20, tone: 40, mix: 15 },
+                crunch: { drive: 50, tone: 60, mix: 30 },
+                heavy: { drive: 80, tone: 70, mix: 50 }
+            };
+            
+            if (presets[preset]) {
+                document.getElementById('distDrive').value = presets[preset].drive;
+                document.getElementById('distTone').value = presets[preset].tone;
+                document.getElementById('distMix').value = presets[preset].mix;
+                updateEffect('distortion', 'drive', presets[preset].drive);
+                updateEffect('distortion', 'tone', presets[preset].tone);
+                updateEffect('distortion', 'mix', presets[preset].mix);
+            }
+        }
+
+        // Master meter animasyonu
+        function animateMasterMeter() {
+            const bars = document.querySelectorAll('.meter-bar');
+            
+            if (isRecording || isPlaying) {
+                bars.forEach(bar => {
+                    const height = 40 + Math.random() * 50;
+                    bar.style.height = height + '%';
+                });
+            } else {
+                bars.forEach(bar => {
+                    bar.style.height = '10%';
+                });
+            }
+            
+            requestAnimationFrame(animateMasterMeter);
+        }
+        animateMasterMeter();
+    </script>
+</body>
+
+</html>

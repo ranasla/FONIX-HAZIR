@@ -1,0 +1,144 @@
+.beat-card {
+  background: rgba(30, 30, 50, 0.8);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 28px;
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+.beat-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255, 122, 184, 0.3);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.beat-card.selected {
+  border-color: #ff146a;
+  box-shadow: 0 0 20px rgba(255, 20, 106, 0.3);
+}
+
+.beat-header {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.beat-cover {
+  width: 80px;
+  height: 80px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.beat-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 16px;
+  transition: transform 0.3s ease;
+}
+
+.beat-card:hover .beat-cover img {
+  transform: scale(1.1);
+}
+
+.beat-cover-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  font-size: 24px;
+  border-radius: 16px;
+}
+
+.beat-card:hover .beat-cover-overlay {
+  opacity: 1;
+}
+
+.beat-info {
+  flex: 1;
+}
+
+.beat-info h3 {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.beat-info p {
+  font-size: 14px;
+  color: #888;
+  margin-bottom: 8px;
+}
+
+.beat-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.beat-tag {
+  font-size: 11px;
+  padding: 4px 10px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  color: #aaa;
+}
+
+.beat-meta {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  color: #888;
+}
+
+.beat-meta span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.beat-player {
+  margin-bottom: 16px;
+}
+
+.beat-player audio {
+  width: 100%;
+  border-radius: 8px;
+  height: 40px;
+}
+
+.beat-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.beat-actions .btn {
+  flex: 1;
+  padding: 12px;
+}
+
+.beat-actions .btn-playing {
+  background: linear-gradient(135deg, #9b59b6, #ff7ab8);
+  animation: pulseBeat 1s ease-in-out infinite;
+}
+
+@keyframes pulseBeat {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}

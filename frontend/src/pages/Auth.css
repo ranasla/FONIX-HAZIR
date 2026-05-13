@@ -1,0 +1,356 @@
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.auth-container {
+  width: 100%;
+  max-width: 440px;
+  position: relative;
+  z-index: 1;
+}
+
+.auth-container.register-container {
+  max-width: 480px;
+}
+
+.back-link {
+  position: absolute;
+  top: -50px;
+  left: 0;
+  color: #888;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.3s;
+}
+
+.back-link:hover {
+  color: #ff7ab8;
+}
+
+.auth-card {
+  background: rgba(30, 30, 50, 0.8);
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 48px 40px;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5);
+}
+
+.auth-card .logo {
+  text-align: center;
+  margin-bottom: 32px;
+  background: none;
+  padding: 0;
+  box-shadow: none;
+}
+
+.auth-card .logo-text {
+  font-family: 'Times New Roman', Georgia, serif;
+  font-size: 48px;
+  font-weight: bold;
+  display: inline-block;
+  margin-bottom: 12px;
+}
+
+.auth-card .logo-text .f { color: #4AADE8; }
+.auth-card .logo-text .on { color: #9b59b6; text-shadow: 0 0 2px rgba(0,0,0,0.3); }
+.auth-card .logo-text .ix { color: #E63946; }
+
+.auth-card .logo p {
+  color: #888;
+  font-size: 14px;
+  margin-top: 8px;
+}
+
+.auth-card h2 {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.auth-card .subtitle {
+  color: #888;
+  font-size: 14px;
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.remember-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  font-size: 13px;
+}
+
+.remember-row label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  color: #888;
+}
+
+.remember-row input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: #ff146a;
+}
+
+.remember-row a {
+  color: #ff7ab8;
+}
+
+.remember-row a:hover {
+  text-decoration: underline;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  margin: 28px 0;
+  color: #555;
+  font-size: 13px;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.divider span {
+  padding: 0 16px;
+}
+
+.social-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.social-btn {
+  flex: 1;
+  padding: 14px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.social-btn img {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+}
+
+.social-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+.social-btn.google {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.social-btn.google:hover {
+  background: rgba(66, 133, 244, 0.2);
+  border-color: #4285f4;
+}
+
+.social-btn.apple {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.social-btn.apple:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: #fff;
+}
+
+.social-btn.email {
+  background: rgba(255, 20, 106, 0.1);
+}
+
+.social-btn.email:hover {
+  background: rgba(255, 20, 106, 0.2);
+  border-color: #ff146a;
+}
+
+.social-btn:hover {
+  transform: translateY(-2px);
+}
+
+.social-btn span {
+  font-weight: 500;
+}
+
+.auth-link {
+  text-align: center;
+  margin-top: 28px;
+  font-size: 14px;
+  color: #888;
+}
+
+.auth-link a {
+  color: #ff7ab8;
+  font-weight: 600;
+}
+
+.auth-link a:hover {
+  text-decoration: underline;
+}
+
+.password-strength {
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  margin-top: 8px;
+  overflow: hidden;
+}
+
+.password-strength-bar {
+  height: 100%;
+  border-radius: 2px;
+  transition: all 0.3s;
+}
+
+.password-hint {
+  font-size: 11px;
+  color: #666;
+  margin-top: 6px;
+}
+
+.terms {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 24px;
+  font-size: 13px;
+  color: #888;
+}
+
+.terms input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #ff146a;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.terms a {
+  color: #ff7ab8;
+}
+
+@media (max-width: 500px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .auth-card {
+    padding: 32px 24px;
+  }
+
+  .email-input-group {
+    flex-direction: column;
+  }
+
+  .email-input-group .email-username,
+  .email-input-group .email-domain {
+    width: 100%;
+    border-radius: 12px;
+  }
+}
+
+/* E-posta input grubu */
+.email-input-group {
+  display: flex;
+  gap: 0;
+}
+
+.email-input-group .email-username {
+  flex: 1;
+  border-radius: 12px 0 0 12px !important;
+  border-right: none !important;
+}
+
+.email-input-group .email-domain {
+  width: 140px;
+  padding: 14px 12px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0 12px 12px 0;
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 30px;
+}
+
+.email-input-group .email-domain:hover,
+.email-input-group .email-domain:focus {
+  border-color: rgba(255, 122, 184, 0.5);
+  background-color: rgba(255, 255, 255, 0.12);
+}
+
+.email-input-group .email-domain option {
+  background: #1e1e32;
+  color: #fff;
+  padding: 10px;
+}
+
+/* Login Type Toggle */
+.login-type-toggle {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.login-type-toggle .toggle-btn {
+  flex: 1;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  color: #888;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.login-type-toggle .toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.login-type-toggle .toggle-btn.active {
+  background: linear-gradient(135deg, #ff146a 0%, #ff7ab8 100%);
+  border-color: #ff146a;
+  color: #fff;
+  font-weight: 600;
+}

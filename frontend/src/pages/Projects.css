@@ -1,0 +1,11 @@
+.projects-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 30px;
+}
+
+.project-count {
+  font-size: 14px;
+  color: #888;
+}

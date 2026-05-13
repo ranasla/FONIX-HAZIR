@@ -1,0 +1,35 @@
+# Bağımlılıklar
+node_modules/
+frontend/node_modules/
+backend/node_modules/
+
+# Veritabanı dosyaları
+*.db
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# Log dosyaları
+*.log
+backend_log.txt
+frontend_log.txt
+
+# Ortam değişkenleri
+.env
+.env.local
+.env.production
+
+# Build çıktıları
+frontend/dist/
+frontend/build/
+
+# IDE
+.vscode/settings.json
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

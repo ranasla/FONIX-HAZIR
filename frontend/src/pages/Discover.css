@@ -1,0 +1,139 @@
+.songs-section {
+  flex: 1;
+}
+
+.section-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.section-title .count {
+  font-size: 14px;
+  color: #888;
+  font-weight: 400;
+}
+
+.songs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.loading {
+  text-align: center;
+  padding: 60px 20px;
+  color: #888;
+  font-size: 16px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #666;
+}
+
+.empty-state span {
+  font-size: 48px;
+  display: block;
+  margin-bottom: 16px;
+}
+
+.empty-state p {
+  font-size: 16px;
+}
+
+/* Sidebar */
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.top-songs-card,
+.cta-card {
+  background: rgba(30, 30, 50, 0.6);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 24px;
+}
+
+.top-songs-card h3,
+.cta-card h3 {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.sidebar-desc {
+  color: #888;
+  font-size: 13px;
+  margin-bottom: 20px;
+}
+
+.top-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.top-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
+  transition: all 0.3s;
+}
+
+.top-item:hover {
+  background: rgba(255, 122, 184, 0.1);
+}
+
+.rank {
+  width: 28px;
+  height: 28px;
+  background: linear-gradient(135deg, #ffc107, #fd7e14);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 13px;
+  color: #000;
+}
+
+.top-info {
+  flex: 1;
+}
+
+.top-info h4 {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.top-info p {
+  font-size: 12px;
+  color: #888;
+}
+
+.top-rating {
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffc107;
+}
+
+.cta-card p {
+  color: #888;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+.cta-card .btn {
+  width: 100%;
+}

@@ -1,0 +1,182 @@
+[
+    {
+        "name": "257",
+        "artist": "Mixkit",
+        "genre": "Trap",
+        "bpm": 120,
+        "duration": "2:30",
+        "cover_color": "#ff146a",
+        "url": "/static/beats/257.mp3"
+    },
+    {
+        "name": "267",
+        "artist": "Mixkit",
+        "genre": "Trap",
+        "bpm": 120,
+        "duration": "2:30",
+        "cover_color": "#ff146a",
+        "url": "/static/beats/267.mp3"
+    },
+    {
+        "name": "364",
+        "artist": "Mixkit",
+        "genre": "Trap",
+        "bpm": 120,
+        "duration": "2:30",
+        "cover_color": "#ff146a",
+        "url": "/static/beats/364.mp3"
+    },
+    {
+        "name": "404",
+        "artist": "Mixkit",
+        "genre": "Trap",
+        "bpm": 120,
+        "duration": "2:30",
+        "cover_color": "#ff146a",
+        "url": "/static/beats/404.mp3"
+    },
+    {
+        "name": "301",
+        "artist": "Mixkit",
+        "genre": "Trap",
+        "bpm": 120,
+        "duration": "2:30",
+        "cover_color": "#ff146a",
+        "url": "/static/beats/301.mp3"
+    },
+    {
+        "name": "267",
+        "artist": "Mixkit",
+        "genre": "Hip-Hop",
+        "bpm": 120,
+        "duration": "2:30",
+        "cover_color": "#ff146a",
+        "url": "/static/beats/267.mp3"
+    },
+    {
+        "name": "364",
+        "artist": "Mixkit",
+        "genre": "Hip-Hop",
+        "bpm": 120,
+        "duration": "2:30",
+        "cover_color": "#ff146a",
+        "url": "/static/beats/364.mp3"
+    },
+    {
+        "name": "876",
+        "artist": "Mixkit",
+        "genre": "Hip-Hop",
+        "bpm": 120,
+        "duration": "2:30",
+        "cover_color": "#ff146a",
+        "url": "/static/beats/876.mp3"
+    },
+    {
+        "name": "1136",
+        "artist": "Mixkit",
+        "genre": "Hip-Hop",
+        "bpm": 120,
+        "duration": "2:30",
+        "cover_color": "#ff146a",
+        "url": "/static/beats/1136.mp3"
+    },
+    {
+        "name": "283",
+        "artist": "Mixkit",
+        "genre": "Hip-Hop",
+        "bpm": 120,
+        "duration": "2:30",
+        "cover_color": "#ff146a",
+        "url": "/static/beats/283.mp3"
+    },
+    {
+        "name": "765",
+        "artist": "Mixkit",
+        "genre": "Lo-fi",
+        "bpm": 120,
+        "duration": "2:30",
+        "cover_color": "#ff146a",
+        "url": "/static/beats/765.mp3"
+    },
+    {
+        "name": "135",
+        "artist": "Mixkit",
+        "genre": "Lo-fi",
+        "bpm": 120,
+        "duration": "2:30",
+        "cover_color": "#ff146a",
+        "url": "/static/beats/135.mp3"
+    },
+    {
+        "name": "766",
+        "artist": "Mixkit",
+        "genre": "Lo-fi",
+        "bpm": 120,
+        "duration": "2:30",
+        "cover_color": "#ff146a",
+        "url": "/static/beats/766.mp3"
+    },
+    {
+        "name": "764",
+        "artist": "Mixkit",
+        "genre": "Lo-fi",
+        "bpm": 120,
+        "duration": "2:30",
+        "cover_color": "#ff146a",
+        "url": "/static/beats/764.mp3"
+    },
+    {
+        "name": "282",
+        "artist": "Mixkit",
+        "genre": "Lo-fi",
+        "bpm": 120,
+        "duration": "2:30",
+        "cover_color": "#ff146a",
+        "url": "/static/beats/282.mp3"
+    },
+    {
+        "name": "102",
+        "artist": "Mixkit",
+        "genre": "Electronic",
+        "bpm": 120,
+        "duration": "2:30",
+        "cover_color": "#ff146a",
+        "url": "/static/beats/102.mp3"
+    },
+    {
+        "name": "114",
+        "artist": "Mixkit",
+        "genre": "Electronic",
+        "bpm": 120,
+        "duration": "2:30",
+        "cover_color": "#ff146a",
+        "url": "/static/beats/114.mp3"
+    },
+    {
+        "name": "570",
+        "artist": "Mixkit",
+        "genre": "Electronic",
+        "bpm": 120,
+        "duration": "2:30",
+        "cover_color": "#ff146a",
+        "url": "/static/beats/570.mp3"
+    },
+    {
+        "name": "440",
+        "artist": "Mixkit",
+        "genre": "Electronic",
+        "bpm": 120,
+        "duration": "2:30",
+        "cover_color": "#ff146a",
+        "url": "/static/beats/440.mp3"
+    },
+    {
+        "name": "685",
+        "artist": "Mixkit",
+        "genre": "Electronic",
+        "bpm": 120,
+        "duration": "2:30",
+        "cover_color": "#ff146a",
+        "url": "/static/beats/685.mp3"
+    }
+]

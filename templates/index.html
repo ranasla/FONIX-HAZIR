@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%);
+            color: #f5f5ff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Kayan Notalar Animasyonu */
+        .floating-notes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .note {
+            position: absolute;
+            font-size: 24px;
+            opacity: 0.1;
+            animation: floatNote linear infinite;
+        }
+
+        @keyframes floatNote {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.15;
+            }
+            90% {
+                opacity: 0.15;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        /* Header */
+        header {
+            height: 100px;
+            background: rgba(255, 20, 106, 0.95);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 60px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 30px rgba(255, 20, 106, 0.3);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-family: 'Times New Roman', Georgia, serif;
+            font-size: 48px;
+            font-weight: bold;
+            text-decoration: none;
+            background: white;
+            padding: 12px 24px;
+            border-radius: 14px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .logo .f { color: #4AADE8; }
+        .logo .on { color: #ffffff; text-shadow: 0 0 2px rgba(0,0,0,0.3); }
+        .logo .ix { color: #E63946; }
+
+        .nav-links {
+            display: flex;
+            gap: 14px;
+            font-size: 20px;
+            font-weight: 500;
+        }
+
+        .nav-links a {
+            opacity: 0.9;
+            transition: all 0.3s;
+            padding: 14px 26px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-links a:hover {
+            opacity: 1;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        /* Main Container */
+        main {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 50px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Hero */
+        .hero {
+            text-align: center;
+            padding: 50px 0 70px;
+        }
+
+        .hero h1 {
+            font-size: 64px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #fff 0%, #ff7ab8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+        }
+
+        .hero p {
+            font-size: 24px;
+            color: #a0a0b8;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Genre Pills */
+        .genres-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 50px;
+        }
+
+        .genre-pill {
+            padding: 16px 32px;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .genre-pill:hover {
+            background: rgba(255, 122, 184, 0.2);
+            border-color: rgba(255, 122, 184, 0.4);
+        }
+
+        .genre-pill.active {
+            background: linear-gradient(135deg, #ff146a, #ff7ab8);
+            border-color: transparent;
+            color: #fff;
+        }
+
+        /* Page Grid */
+        .page-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 2.5fr) minmax(280px, 1fr);
+            gap: 30px;
+        }
+
+        /* Song Card */
+        .song-card {
+            background: rgba(30, 30, 50, 0.8);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 32px;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .song-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100px;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0.3;
+            mask-image: linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%);
+            -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%);
+        }
+
+        .song-card-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .song-card:hover {
+            border-color: rgba(255, 122, 184, 0.3);
+            transform: translateX(4px);
+        }
+
+        .song-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+
+        .song-info h3 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .song-meta {
+            font-size: 16px;
+            color: #888;
+        }
+
+        .song-rating {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 215, 0, 0.1);
+            padding: 10px 18px;
+            border-radius: 24px;
+            font-size: 18px;
+            color: #ffd700;
+        }
+
+        audio {
+            width: 100%;
+            margin: 12px 0;
+            border-radius: 8px;
+        }
+
+        .rate-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-size: 18px;
+        }
+
+        .rate-row select {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            padding: 10px 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .rate-row button {
+            background: linear-gradient(135deg, #ff146a, #ff7ab8);
+            border: none;
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .rate-row button:hover {
+            transform: scale(1.05);
+        }
+
+        /* Sidebar */
+        .sidebar-card {
+            background: rgba(30, 30, 50, 0.8);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 32px;
+            margin-bottom: 24px;
+        }
+
+        .sidebar-card h3 {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .top-list {
+            list-style: none;
+        }
+
+        .top-list li {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 14px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .top-list li:last-child {
+            border-bottom: none;
+        }
+
+        .top-rank {
+            width: 36px;
+            height: 36px;
+            background: rgba(255, 122, 184, 0.2);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+            color: #ff7ab8;
+        }
+
+        .top-info {
+            flex: 1;
+        }
+
+        .top-info h4 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .top-info p {
+            font-size: 15px;
+            color: #888;
+        }
+
+        .top-rating {
+            font-size: 17px;
+            color: #ffd700;
+        }
+
+        /* Button */
+        .btn {
+            padding: 16px 32px;
+            border-radius: 14px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ff146a, #ff7ab8);
+            color: #fff;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 80px 30px;
+            color: #666;
+            font-size: 20px;
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .page-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="floating-notes" id="floatingNotes"></div>
+
+    <header>
+        <a href="{{ url_for('index') }}" class="logo"><span class="f">F</span><span class="on">ON</span><span class="ix">IX</span></a>
+        <div class="nav-links">
+            <a href="{{ url_for('index') }}">🏠 Keşfet</a>
+            <a href="{{ url_for('beats_page') }}">🎹 Beatler</a>
+            <a href="{{ url_for('karaoke_lobby') }}">🎤 Karaoke</a>
+            <a href="{{ url_for('studio') }}">🎙️ Stüdyo</a>
+            <a href="{{ url_for('lyrics_page') }}">✍️ Söz Yaz</a>
+            <a href="{{ url_for('top_page') }}">🏆 Top 10</a>
+            {% if current_user %}
+            <a href="{{ url_for('profile') }}">👤 {{ current_user }}</a>
+            <a href="{{ url_for('logout') }}">🚪 Çıkış</a>
+            {% else %}
+            <a href="{{ url_for('login') }}">🔐 Giriş</a>
+            {% endif %}
+        </div>
+    </header>
+
+    <main>
+        <div class="hero">
+            <h1>🎵 Müziğini Keşfet</h1>
+            <p>Şarkıları dinle, puanla ve en iyileri top listesine taşı!</p>
+        </div>
+
+        <div class="genres-container">
+            {% for g in genres %}
+            <a href="{{ url_for('index', genre=g) }}">
+                <div class="genre-pill {% if g == active_genre %}active{% endif %}">{{ g }}</div>
+            </a>
+            {% endfor %}
+        </div>
+
+        <div class="page-grid">
+            <section>
+                {% if songs %}
+                {% for s in songs %}
+                <div class="song-card" data-genre="{{ s.genre }}">
+                    <div class="song-card-content">
+                        <div class="song-header">
+                            <div class="song-info">
+                                <h3>{{ s.title }}</h3>
+                                <div class="song-meta">{{ s.artist }} · {{ s.genre }}</div>
+                            </div>
+                            <div class="song-rating">⭐ {{ s.avg_rating }}/5 ({{ s.rating_count }})</div>
+                        </div>
+
+                        <audio controls>
+                            <source src="{{ s.url }}" type="audio/mpeg">
+                        </audio>
+
+                        <div class="rate-row">
+                            <span>Puan ver:</span>
+                            <form method="post" action="{{ url_for('rate_song', song_id=s.id) }}"
+                                style="display: flex; gap: 8px; align-items: center;">
+                                <select name="rating">
+                                    {% for i in range(1, 6) %}
+                                    <option value="{{ i }}">{{ i }} ⭐</option>
+                                    {% endfor %}
+                                </select>
+                                <button type="submit">Puanla</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-state-icon">🎵</div>
+                    <p>Bu türde henüz şarkı yok.</p>
+                    <a href="{{ url_for('add_song') }}" class="btn btn-primary">+ İlk Şarkıyı Ekle</a>
+                </div>
+                {% endif %}
+            </section>
+
+            <aside>
+                <div class="sidebar-card">
+                    <h3>🔥 Top 5</h3>
+                    {% if top5 %}
+                    <ul class="top-list">
+                        {% for s in top5 %}
+                        <li>
+                            <div class="top-rank">{{ loop.index }}</div>
+                            <div class="top-info">
+                                <h4>{{ s.title }}</h4>
+                                <p>{{ s.artist }}</p>
+                            </div>
+                            <div class="top-rating">⭐ {{ s.avg_rating }}</div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    <a href="{{ url_for('top_page') }}" class="btn btn-secondary"
+                        style="width: 100%; margin-top: 16px; justify-content: center;">Tüm Listeyi Gör →</a>
+                    {% else %}
+                    <p style="color: #666; font-size: 13px;">Henüz puanlama yapılmadı.</p>
+                    {% endif %}
+                </div>
+
+                <div class="sidebar-card">
+                    <h3>✨ Hızlı Erişim</h3>
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <a href="{{ url_for('beats_page') }}" class="btn btn-secondary"
+                            style="justify-content: center;">🎹 Free Beatler</a>
+                        <a href="{{ url_for('lyrics_page') }}" class="btn btn-secondary"
+                            style="justify-content: center;">✍️ Söz Yaz</a>
+                        <a href="{{ url_for('add_song') }}" class="btn btn-secondary" style="justify-content: center;">➕
+                            Şarkı Ekle</a>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <script>
+        const notes = ['♪', '♫', '♬', '🎵', '🎶'];
+        const container = document.getElementById('floatingNotes');
+
+        function createNote() {
+            const note = document.createElement('div');
+            note.className = 'note';
+            note.textContent = notes[Math.floor(Math.random() * notes.length)];
+            note.style.left = Math.random() * 100 + '%';
+            note.style.animationDuration = (15 + Math.random() * 20) + 's';
+            container.appendChild(note);
+            setTimeout(() => note.remove(), 35000);
+        }
+
+        for (let i = 0; i < 10; i++) setTimeout(createNote, i * 500);
+        setInterval(createNote, 2500);
+
+        // Genre-based background images for song cards
+        const genreImages = {
+            'trap': 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=300&h=300&fit=crop',
+            'drill': 'https://images.unsplash.com/photo-1571974599782-87624638275c?w=300&h=300&fit=crop',
+            'lo-fi': 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=300&h=300&fit=crop',
+            'lofi': 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=300&h=300&fit=crop',
+            'hip-hop': 'https://images.unsplash.com/photo-1571974599782-87624638275c?w=300&h=300&fit=crop',
+            'hip hop': 'https://images.unsplash.com/photo-1571974599782-87624638275c?w=300&h=300&fit=crop',
+            'r&b': 'https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=300&h=300&fit=crop',
+            'rnb': 'https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=300&h=300&fit=crop',
+            'pop': 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=300&h=300&fit=crop',
+            'electronic': 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=300&h=300&fit=crop',
+            'edm': 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=300&h=300&fit=crop',
+            'ambient': 'https://images.unsplash.com/photo-1507838153414-b4b713384a76?w=300&h=300&fit=crop',
+            'jazz': 'https://images.unsplash.com/photo-1415201364774-f6f0bb35f28f?w=300&h=300&fit=crop',
+            'rock': 'https://images.unsplash.com/photo-1498038432885-c6f3f1b912ee?w=300&h=300&fit=crop',
+            'default': 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=300&h=300&fit=crop'
+        };
+
+        document.querySelectorAll('.song-card').forEach(card => {
+            const genre = (card.dataset.genre || '').toLowerCase();
+            const imageUrl = genreImages[genre] || genreImages['default'];
+            card.style.setProperty('--bg-image', `url('${imageUrl}')`);
+        });
+
+        // Add dynamic style for song card backgrounds
+        const style = document.createElement('style');
+        style.textContent = '.song-card::before { background-image: var(--bg-image); }';
+        document.head.appendChild(style);
+    </script>
+</body>
+
+</html>

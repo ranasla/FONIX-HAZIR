@@ -1,0 +1,2699 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FONIX — Mixer (FL Studio)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: linear-gradient(135deg, #0a0a14 0%, #12121f 50%, #0d1520 100%);
+            color: #f5f5ff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        a { color: inherit; text-decoration: none; }
+
+        /* Header */
+        header {
+            height: 60px;
+            background: rgba(20, 20, 35, 0.95);
+            backdrop-filter: blur(20px);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-family: 'Times New Roman', Georgia, serif;
+            font-size: 26px;
+            font-weight: bold;
+        }
+        .logo .f { color: #4AADE8; }
+        .logo .on { color: #1a1a2e; }
+        .logo .ix { color: #E63946; }
+
+        nav { display: flex; gap: 24px; }
+        nav a { font-size: 13px; font-weight: 500; opacity: 0.7; transition: all 0.3s; padding: 8px 12px; border-radius: 6px; }
+        nav a:hover, nav a.active { opacity: 1; background: rgba(255, 20, 106, 0.2); color: #ff7ab8; }
+
+        /* Main Mixer Container */
+        .mixer-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff 0%, #ff7ab8 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .page-subtitle { color: #888; font-size: 14px; margin-top: 4px; }
+
+        /* Transport Controls */
+        .transport-bar {
+            background: linear-gradient(135deg, #1a1a2e, #252545);
+            border-radius: 16px;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .transport-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .transport-btn:hover { transform: scale(1.1); }
+        .btn-play-main { background: linear-gradient(135deg, #22c55e, #16a34a); color: white; }
+        .btn-play-main.playing { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .btn-stop-main { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; }
+        .btn-record-main { background: linear-gradient(135deg, #ff146a, #e91e63); color: white; }
+        .btn-record-main.recording { animation: recordPulse 1s infinite; }
+
+        @keyframes recordPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 20, 106, 0.7); }
+            50% { box-shadow: 0 0 0 15px rgba(255, 20, 106, 0); }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+
+        .time-display-main {
+            font-family: 'Courier New', monospace;
+            font-size: 32px;
+            font-weight: bold;
+            color: #22c55e;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 8px 20px;
+            border-radius: 8px;
+            min-width: 140px;
+            text-align: center;
+        }
+
+        .bpm-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 8px 16px;
+            border-radius: 8px;
+        }
+
+        .bpm-control label { font-size: 12px; color: #888; }
+        .bpm-control input {
+            width: 60px;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 6px;
+            border-radius: 4px;
+            font-size: 16px;
+            text-align: center;
+        }
+
+        .transport-spacer { flex: 1; }
+
+        .master-volume {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .master-volume label { font-size: 12px; color: #888; }
+        .master-volume input[type="range"] {
+            width: 120px;
+            accent-color: #ff146a;
+        }
+
+        /* Mixer Grid */
+        .mixer-grid {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 20px;
+        }
+
+        /* Track List Panel */
+        .track-panel {
+            background: rgba(25, 25, 45, 0.8);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 20px;
+        }
+
+        .panel-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .track-section {
+            margin-bottom: 20px;
+        }
+
+        .section-header {
+            font-size: 12px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .delete-all-btn {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: none;
+        }
+
+        .delete-all-btn:hover {
+            background: rgba(239, 68, 68, 0.4);
+            border-color: #ef4444;
+        }
+
+        /* Genre Filter */
+        .genre-filter {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 12px;
+            padding: 8px 0;
+        }
+
+        .genre-tag {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #888;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .genre-tag:hover {
+            background: rgba(255, 20, 106, 0.2);
+            border-color: rgba(255, 20, 106, 0.4);
+            color: #ff7ab8;
+        }
+
+        .genre-tag.active {
+            background: linear-gradient(135deg, #ff146a, #ff7ab8);
+            border-color: #ff146a;
+            color: white;
+        }
+
+        .track-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .track-item {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .track-item:hover { background: rgba(255, 255, 255, 0.05); }
+        .track-item.selected { border-color: #ff146a; background: rgba(255, 20, 106, 0.1); }
+        .track-item.in-timeline { border-color: #22c55e; }
+
+        .track-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .track-icon.beat { background: linear-gradient(135deg, #6366f1, #8b5cf6); }
+        .track-icon.vocal { background: linear-gradient(135deg, #f59e0b, #d97706); }
+
+        .track-info { flex: 1; }
+        .track-name { font-size: 13px; font-weight: 600; }
+        .track-meta { font-size: 11px; color: #888; }
+
+        .track-add-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: none;
+            background: #22c55e;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            opacity: 0;
+            transition: all 0.3s;
+        }
+
+        .track-delete-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: none;
+            background: #ef4444;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            opacity: 0;
+            transition: all 0.3s;
+            margin-left: 6px;
+        }
+
+        .track-delete-btn:hover {
+            background: #dc2626;
+            transform: scale(1.1);
+        }
+
+        .track-item:hover .track-add-btn,
+        .track-item:hover .track-delete-btn { opacity: 1; }
+
+        /* Timeline Panel */
+        .timeline-panel {
+            background: rgba(25, 25, 45, 0.8);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            overflow: hidden;
+        }
+
+        .timeline-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .timeline-title { font-size: 16px; font-weight: 700; }
+
+        .timeline-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .timeline-actions button {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: none;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-export {
+            background: linear-gradient(135deg, #ff146a, #e91e63);
+            color: white;
+        }
+
+        .btn-clear {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        /* Timeline Ruler */
+        .timeline-ruler {
+            height: 30px;
+            background: rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: flex-end;
+            padding: 0 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .ruler-mark {
+            flex: 1;
+            text-align: left;
+            font-size: 10px;
+            color: #666;
+            padding-bottom: 4px;
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            padding-left: 4px;
+        }
+
+        /* Timeline Tracks */
+        .timeline-tracks {
+            padding: 20px;
+            min-height: 300px;
+        }
+
+        .timeline-track {
+            height: 80px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            margin-bottom: 12px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .track-label {
+            width: 100px;
+            padding: 0 16px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #888;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            height: 100%;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .track-label .mute-btn,
+        .track-label .solo-btn {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            border: none;
+            font-size: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .mute-btn { background: rgba(255, 255, 255, 0.1); color: #888; }
+        .mute-btn.active { background: #ef4444; color: white; }
+        .solo-btn { background: rgba(255, 255, 255, 0.1); color: #888; }
+        .solo-btn.active { background: #f59e0b; color: white; }
+
+        .track-content {
+            flex: 1;
+            height: 100%;
+            position: relative;
+            padding: 10px;
+        }
+
+        .audio-block {
+            position: absolute;
+            height: calc(100% - 20px);
+            top: 10px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            padding: 0 12px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: move;
+            transition: all 0.2s;
+            overflow: hidden;
+        }
+
+        .audio-block:hover {
+            transform: scaleY(1.05);
+        }
+
+        .audio-block.beat-block {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.8), rgba(139, 92, 246, 0.8));
+            border: 1px solid rgba(139, 92, 246, 0.5);
+        }
+
+        .audio-block.vocal-block {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.8), rgba(217, 119, 6, 0.8));
+            border: 1px solid rgba(245, 158, 11, 0.5);
+        }
+
+        .audio-block .waveform-mini {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.3;
+        }
+
+        .audio-block .block-name {
+            position: relative;
+            z-index: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .audio-block .delete-block {
+            position: absolute;
+            right: 4px;
+            top: 4px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.5);
+            border: none;
+            color: white;
+            font-size: 10px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .audio-block:hover .delete-block { opacity: 1; }
+
+        /* Audio Block Controls */
+        .block-controls {
+            position: absolute;
+            bottom: 2px;
+            left: 8px;
+            right: 30px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            opacity: 0;
+            transition: opacity 0.2s;
+            z-index: 2;
+        }
+
+        .audio-block:hover .block-controls { opacity: 1; }
+
+        .block-volume {
+            width: 50px;
+            height: 4px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 2px;
+            cursor: pointer;
+        }
+
+        .block-volume::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #fff;
+            cursor: pointer;
+            box-shadow: 0 0 4px rgba(0,0,0,0.5);
+        }
+
+        .block-loop-btn {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(0, 0, 0, 0.4);
+            color: #888;
+            font-size: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .block-loop-btn:hover { background: rgba(0, 0, 0, 0.6); }
+        .block-loop-btn.active { background: #ff146a; color: white; }
+
+        .block-volume-label {
+            font-size: 9px;
+            color: rgba(255,255,255,0.7);
+            min-width: 25px;
+        }
+
+        /* Resize Handle */
+        .block-resize-handle {
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 8px;
+            height: 100%;
+            cursor: ew-resize;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.2));
+            border-radius: 0 8px 8px 0;
+        }
+
+        .audio-block:hover .block-resize-handle {
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.4));
+        }
+
+        /* Loop indicator */
+        .loop-indicator {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            font-size: 10px;
+            background: rgba(255, 20, 106, 0.8);
+            padding: 2px 5px;
+            border-radius: 3px;
+            display: none;
+        }
+
+        .audio-block.looping .loop-indicator { display: block; }
+
+        /* Playhead */
+        .playhead {
+            position: absolute;
+            top: 0;
+            left: 120px;
+            width: 2px;
+            height: 100%;
+            background: #ff146a;
+            z-index: 10;
+            pointer-events: none;
+            transition: left 0.05s linear;
+        }
+
+        .playhead::before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            left: -6px;
+            width: 14px;
+            height: 14px;
+            background: #ff146a;
+            border-radius: 3px;
+            transform: rotate(45deg);
+        }
+
+        /* Empty State */
+        .empty-timeline {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 200px;
+            color: #555;
+        }
+
+        .empty-timeline-icon { font-size: 48px; margin-bottom: 16px; }
+        .empty-timeline-text { font-size: 14px; }
+
+        /* Mixer Channel Strip */
+        .channel-strips {
+            display: flex;
+            gap: 12px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            overflow-x: auto;
+        }
+
+        .channel-strip {
+            width: 80px;
+            background: rgba(30, 30, 50, 0.8);
+            border-radius: 12px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .channel-name {
+            font-size: 10px;
+            font-weight: 600;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
+        }
+
+        .channel-meter {
+            width: 12px;
+            height: 120px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 6px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .meter-fill {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: linear-gradient(to top, #22c55e, #84cc16, #fbbf24, #ef4444);
+            border-radius: 6px;
+            transition: height 0.1s;
+        }
+
+        .channel-fader {
+            width: 100%;
+            writing-mode: bt-lr;
+            -webkit-appearance: slider-vertical;
+            height: 80px;
+            accent-color: #ff146a;
+        }
+
+        .channel-pan {
+            width: 100%;
+        }
+
+        .channel-btns {
+            display: flex;
+            gap: 4px;
+        }
+
+        .channel-btns button {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            border: none;
+            font-size: 10px;
+            cursor: pointer;
+        }
+
+        /* Effects Panel */
+        .effects-panel {
+            background: linear-gradient(135deg, #1a1a2e, #252545);
+            border-radius: 16px;
+            padding: 16px;
+            margin-top: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .effects-header {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: #ff7ab8;
+        }
+
+        .effect-section {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 12px;
+        }
+
+        .effect-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .effect-toggle {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+        }
+
+        .effect-toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #333;
+            transition: .3s;
+            border-radius: 20px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 14px;
+            width: 14px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+
+        .effect-toggle input:checked + .toggle-slider {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+        }
+
+        .effect-toggle input:checked + .toggle-slider:before {
+            transform: translateX(20px);
+        }
+
+        .effect-controls {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .effect-knob {
+            flex: 1;
+            min-width: 70px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .effect-knob label {
+            font-size: 10px;
+            color: #aaa;
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+
+        .effect-knob input[type="range"] {
+            width: 100%;
+            height: 8px;
+            -webkit-appearance: none;
+            background: linear-gradient(90deg, rgba(255,255,255,0.1), rgba(255,255,255,0.2));
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .effect-knob input[type="range"]:hover {
+            background: linear-gradient(90deg, rgba(255,255,255,0.15), rgba(255,255,255,0.3));
+        }
+
+        .effect-knob input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: linear-gradient(135deg, #ff146a, #ff7ab8);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(255, 20, 106, 0.4);
+            transition: transform 0.2s;
+        }
+
+        .effect-knob input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        .effect-knob span {
+            font-size: 11px;
+            color: #22c55e;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            background: rgba(34, 197, 94, 0.1);
+            padding: 2px 8px;
+            border-radius: 4px;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            min-width: 50px;
+            text-align: center;
+        }
+
+        .comp-meter {
+            margin-top: 10px;
+        }
+
+        .comp-meter label {
+            font-size: 10px;
+            color: #888;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .comp-meter-bar {
+            height: 8px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .comp-meter-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #22c55e, #f59e0b, #ef4444);
+            transition: width 0.1s;
+        }
+
+        /* AI Effect Sections */
+        .ai-effect {
+            border: 1px solid rgba(138, 43, 226, 0.3);
+            background: linear-gradient(135deg, rgba(138, 43, 226, 0.1), rgba(75, 0, 130, 0.1));
+        }
+
+        .ai-section {
+            border: 1px solid rgba(0, 200, 150, 0.3);
+            background: linear-gradient(135deg, rgba(0, 200, 150, 0.1), rgba(0, 100, 80, 0.1));
+        }
+
+        .ai-badge {
+            background: linear-gradient(135deg, #00c896, #00a080);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        /* Autotune Presets */
+        .autotune-presets {
+            display: flex;
+            gap: 6px;
+            margin-top: 10px;
+        }
+
+        .preset-btn {
+            flex: 1;
+            padding: 6px 8px;
+            background: rgba(138, 43, 226, 0.2);
+            border: 1px solid rgba(138, 43, 226, 0.3);
+            color: #b388ff;
+            border-radius: 6px;
+            font-size: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .preset-btn:hover, .preset-btn.active {
+            background: rgba(138, 43, 226, 0.4);
+            border-color: #8a2be2;
+            color: white;
+        }
+
+        /* Voice Changer Presets */
+        .voice-presets {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .voice-preset-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #888;
+            border-radius: 8px;
+            font-size: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .voice-preset-btn span {
+            font-size: 18px;
+            margin-bottom: 4px;
+        }
+
+        .voice-preset-btn:hover, .voice-preset-btn.active {
+            background: linear-gradient(135deg, rgba(255, 20, 106, 0.2), rgba(138, 43, 226, 0.2));
+            border-color: #ff146a;
+            color: white;
+        }
+
+        /* AI Mix Presets */
+        .ai-presets {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .ai-preset-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 12px;
+            background: rgba(0, 200, 150, 0.1);
+            border: 1px solid rgba(0, 200, 150, 0.2);
+            color: #fff;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+        }
+
+        .ai-preset-btn span {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        .ai-preset-btn strong {
+            font-size: 12px;
+            color: #00c896;
+        }
+
+        .ai-preset-btn small {
+            font-size: 10px;
+            color: #666;
+        }
+
+        .ai-preset-btn:hover {
+            background: rgba(0, 200, 150, 0.25);
+            border-color: #00c896;
+            transform: translateY(-2px);
+        }
+
+        .ai-preset-btn.active {
+            background: linear-gradient(135deg, rgba(0, 200, 150, 0.3), rgba(0, 150, 100, 0.3));
+            border-color: #00c896;
+            box-shadow: 0 0 15px rgba(0, 200, 150, 0.3);
+        }
+
+        /* File Upload */
+        .upload-section {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .upload-btn {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: #888;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .upload-btn:hover {
+            border-color: #ff146a;
+            color: #ff7ab8;
+            background: rgba(255, 20, 106, 0.1);
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .mixer-grid { grid-template-columns: 1fr; }
+            .track-panel { order: 2; }
+            .timeline-panel { order: 1; }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <a href="{{ url_for('index') }}" class="logo">
+            <span class="f">F</span><span class="on">ON</span><span class="ix">IX</span>
+        </a>
+        <nav>
+            <a href="{{ url_for('index') }}">🏠 Ana Sayfa</a>
+            <a href="{{ url_for('studio') }}">🎙️ Stüdyo</a>
+            <a href="{{ url_for('mixer_page') }}" class="active">🎛️ Mixer</a>
+            <a href="{{ url_for('beats_page') }}">🎹 Beatler</a>
+            <a href="{{ url_for('lyrics_page') }}">✍️ Söz Yaz</a>
+        </nav>
+        <div>
+            {% if session.user_id %}
+            <a href="{{ url_for('profile') }}" style="background: linear-gradient(135deg, #ff146a, #ff7ab8); padding: 8px 16px; border-radius: 8px; font-size: 13px;">👤 Profil</a>
+            {% else %}
+            <a href="{{ url_for('login') }}" style="background: rgba(255,255,255,0.1); padding: 8px 16px; border-radius: 8px; font-size: 13px;">Giriş Yap</a>
+            {% endif %}
+        </div>
+    </header>
+
+    <div class="mixer-container">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">🎛️ FONIX Mixer</h1>
+                <p class="page-subtitle">Kayıtlarını beatlerle birleştir, profesyonel mix oluştur</p>
+            </div>
+        </div>
+
+        <!-- Transport Bar -->
+        <div class="transport-bar">
+            <button class="transport-btn btn-play-main" id="playBtn" onclick="togglePlayback()">▶️</button>
+            <button class="transport-btn btn-stop-main" onclick="stopPlayback()">⏹️</button>
+            <button class="transport-btn btn-record-main" id="recordBtn" onclick="toggleRecord()">⏺️</button>
+            
+            <div class="time-display-main" id="timeDisplay">00:00:00</div>
+            
+            <div class="bpm-control">
+                <label>BPM</label>
+                <input type="number" id="bpmInput" value="140" min="60" max="200">
+            </div>
+
+            <div class="transport-spacer"></div>
+
+            <div class="master-volume">
+                <label>🔊 Master</label>
+                <input type="range" id="masterVolume" min="0" max="100" value="80">
+                <span id="masterVolumeValue">80%</span>
+            </div>
+        </div>
+
+        <!-- Main Mixer Grid -->
+        <div class="mixer-grid">
+            <!-- Track Selection Panel -->
+            <div class="track-panel">
+                <h3 class="panel-title">📂 Ses Kaynakları</h3>
+
+                <!-- Beats Section with Genre Filter -->
+                <div class="track-section">
+                    <div class="section-header" style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>🎹 Beatler</span>
+                        <span style="font-size: 10px; color: #666;">{{ beats|length }} beat</span>
+                    </div>
+                    
+                    <!-- Genre Filter Tags -->
+                    <div class="genre-filter" id="genreFilter">
+                        <button class="genre-tag active" data-genre="all" onclick="filterBeats('all', this)">Tümü</button>
+                        {% set genres = [] %}
+                        {% for beat in beats %}
+                            {% if beat.genre not in genres %}
+                                {% set _ = genres.append(beat.genre) %}
+                            {% endif %}
+                        {% endfor %}
+                        {% for genre in genres %}
+                        <button class="genre-tag" data-genre="{{ genre }}" onclick="filterBeats('{{ genre }}', this)">{{ genre }}</button>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="track-list" id="beatsList" style="max-height: 350px;">
+                        {% for beat in beats %}
+                        <div class="track-item" data-type="beat" data-id="{{ beat.id }}" data-url="{{ beat.url }}" data-name="{{ beat.name }}" data-duration="{{ beat.duration }}" data-genre="{{ beat.genre }}" data-bpm="{{ beat.bpm }}">
+                            <div class="track-icon beat">🎵</div>
+                            <div class="track-info">
+                                <div class="track-name">{{ beat.name }}</div>
+                                <div class="track-meta">{{ beat.artist }} • {{ beat.bpm }} BPM • {{ beat.genre }}</div>
+                            </div>
+                            <button class="track-add-btn" onclick="addToTimeline(this.parentElement)">+</button>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Recordings Section -->
+                <div class="track-section">
+                    <div class="section-header" style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>🎤 Kayıtlarım</span>
+                        <button class="delete-all-btn" onclick="deleteAllRecordings()" title="Tümünü Sil">🗑️ Tümünü Sil</button>
+                    </div>
+                    <div class="track-list" id="recordingsList">
+                        <div class="empty-state" style="padding: 20px; text-align: center; color: #666;">
+                            <p>Henüz kayıt yok.</p>
+                            <p style="font-size: 12px; margin-top: 8px;">Stüdyo'da kayıt yapın veya dosya yükleyin.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Upload Section -->
+                <div class="upload-section">
+                    <label class="upload-btn">
+                        <input type="file" accept="audio/*" style="display: none;" onchange="handleFileUpload(this)">
+                        📤 Ses Dosyası Yükle
+                    </label>
+                </div>
+            </div>
+
+            <!-- Timeline Panel -->
+            <div class="timeline-panel">
+                <div class="timeline-header">
+                    <span class="timeline-title">🎬 Timeline</span>
+                    <div class="timeline-actions">
+                        <button class="btn-clear" onclick="clearTimeline()">🗑️ Temizle</button>
+                        <button class="btn-export" onclick="exportMix()">💾 Dışa Aktar</button>
+                    </div>
+                </div>
+
+                <!-- Ruler -->
+                <div class="timeline-ruler">
+                    <div class="ruler-mark">0:00</div>
+                    <div class="ruler-mark">0:30</div>
+                    <div class="ruler-mark">1:00</div>
+                    <div class="ruler-mark">1:30</div>
+                    <div class="ruler-mark">2:00</div>
+                    <div class="ruler-mark">2:30</div>
+                    <div class="ruler-mark">3:00</div>
+                    <div class="ruler-mark">3:30</div>
+                </div>
+
+                <!-- Tracks -->
+                <div class="timeline-tracks" id="timelineTracks">
+                    <!-- Beat Track -->
+                    <div class="timeline-track" id="beatTrack">
+                        <div class="track-label">
+                            <span>🎹 Beat</span>
+                            <button class="mute-btn" onclick="toggleMute('beat')">M</button>
+                            <button class="solo-btn" onclick="toggleSolo('beat')">S</button>
+                        </div>
+                        <div class="track-content" id="beatTrackContent">
+                            <!-- Audio blocks will be added here -->
+                        </div>
+                        <div class="playhead" id="playhead"></div>
+                    </div>
+
+                    <!-- Vocal Track -->
+                    <div class="timeline-track" id="vocalTrack">
+                        <div class="track-label">
+                            <span>🎤 Vokal</span>
+                            <button class="mute-btn" onclick="toggleMute('vocal')">M</button>
+                            <button class="solo-btn" onclick="toggleSolo('vocal')">S</button>
+                        </div>
+                        <div class="track-content" id="vocalTrackContent">
+                            <!-- Audio blocks will be added here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Channel Strips -->
+                <div class="channel-strips">
+                    <div class="channel-strip">
+                        <div class="channel-name">Beat</div>
+                        <div class="channel-meter">
+                            <div class="meter-fill" id="beatMeter" style="height: 60%;"></div>
+                        </div>
+                        <input type="range" class="channel-fader" id="beatFader" min="0" max="100" value="80" orient="vertical" oninput="updateBeatVolume(this.value)">
+                        <input type="range" class="channel-pan" id="beatPan" min="-100" max="100" value="0" title="Pan">
+                        <div class="channel-btns">
+                            <button class="mute-btn" onclick="toggleMute('beat')">M</button>
+                            <button class="solo-btn" onclick="toggleSolo('beat')">S</button>
+                        </div>
+                    </div>
+
+                    <div class="channel-strip">
+                        <div class="channel-name">Vokal</div>
+                        <div class="channel-meter">
+                            <div class="meter-fill" id="vocalMeter" style="height: 45%;"></div>
+                        </div>
+                        <input type="range" class="channel-fader" id="vocalFader" min="0" max="100" value="85" orient="vertical" oninput="updateVocalVolume(this.value)">
+                        <input type="range" class="channel-pan" id="vocalPan" min="-100" max="100" value="0" title="Pan">
+                        <div class="channel-btns">
+                            <button class="mute-btn" onclick="toggleMute('vocal')">M</button>
+                            <button class="solo-btn" onclick="toggleSolo('vocal')">S</button>
+                        </div>
+                    </div>
+
+                    <div class="channel-strip" style="background: linear-gradient(135deg, rgba(255, 20, 106, 0.2), rgba(255, 122, 184, 0.1));">
+                        <div class="channel-name">MASTER</div>
+                        <div class="channel-meter">
+                            <div class="meter-fill" id="masterMeter" style="height: 70%;"></div>
+                        </div>
+                        <input type="range" class="channel-fader" id="masterFader" min="0" max="100" value="80" orient="vertical">
+                        <div style="font-size: 10px; color: #888;">L/R</div>
+                    </div>
+                </div>
+
+                <!-- Effects Panel -->
+                <div class="effects-panel">
+                    <div class="effects-header">🎛️ Ses Efektleri</div>
+                    
+                    <!-- EQ -->
+                    <div class="effect-section">
+                        <div class="effect-title">
+                            <span>📊 Equalizer (Ton Dengesi)</span>
+                            <label class="effect-toggle">
+                                <input type="checkbox" id="eqEnabled" checked onchange="toggleEffect('eq')">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <div class="effect-controls">
+                            <div class="effect-knob">
+                                <label>Low (Bas)</label>
+                                <input type="range" id="eqLow" min="-12" max="12" value="0" oninput="applyEffects()">
+                                <span id="eqLowVal">0 dB</span>
+                            </div>
+                            <div class="effect-knob">
+                                <label>Mid (Orta)</label>
+                                <input type="range" id="eqMid" min="-12" max="12" value="0" oninput="applyEffects()">
+                                <span id="eqMidVal">0 dB</span>
+                            </div>
+                            <div class="effect-knob">
+                                <label>High (Tiz)</label>
+                                <input type="range" id="eqHigh" min="-12" max="12" value="0" oninput="applyEffects()">
+                                <span id="eqHighVal">0 dB</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Compressor -->
+                    <div class="effect-section">
+                        <div class="effect-title">
+                            <span>🔊 Compressor (Sıkıştırıcı)</span>
+                            <label class="effect-toggle">
+                                <input type="checkbox" id="compEnabled" checked onchange="toggleEffect('comp')">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <div class="effect-controls">
+                            <div class="effect-knob">
+                                <label>Threshold (Eşik)</label>
+                                <input type="range" id="compThreshold" min="-60" max="0" value="-24" oninput="applyEffects()">
+                                <span id="compThresholdVal">-24 dB</span>
+                            </div>
+                            <div class="effect-knob">
+                                <label>Ratio (Oran)</label>
+                                <input type="range" id="compRatio" min="1" max="20" value="4" oninput="applyEffects()">
+                                <span id="compRatioVal">4:1</span>
+                            </div>
+                            <div class="effect-knob">
+                                <label>Attack (Başlangıç)</label>
+                                <input type="range" id="compAttack" min="0" max="100" value="10" oninput="applyEffects()">
+                                <span id="compAttackVal">10 ms</span>
+                            </div>
+                            <div class="effect-knob">
+                                <label>Release (Bırakma)</label>
+                                <input type="range" id="compRelease" min="50" max="500" value="250" oninput="applyEffects()">
+                                <span id="compReleaseVal">250 ms</span>
+                            </div>
+                        </div>
+                        <div class="comp-meter">
+                            <label>Gain Reduction (Kazanç Azaltma)</label>
+                            <div class="comp-meter-bar">
+                                <div class="comp-meter-fill" id="compMeter"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Reverb -->
+                    <div class="effect-section">
+                        <div class="effect-title">
+                            <span>🌊 Reverb (Yankı)</span>
+                            <label class="effect-toggle">
+                                <input type="checkbox" id="reverbEnabled" onchange="toggleEffect('reverb')">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <div class="effect-controls">
+                            <div class="effect-knob">
+                                <label>Mix (Karışım)</label>
+                                <input type="range" id="reverbMix" min="0" max="100" value="30" oninput="applyEffects()">
+                                <span id="reverbMixVal">30%</span>
+                            </div>
+                            <div class="effect-knob">
+                                <label>Decay (Sönüm)</label>
+                                <input type="range" id="reverbDecay" min="0.1" max="5" step="0.1" value="2" oninput="applyEffects()">
+                                <span id="reverbDecayVal">2.0 s</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Delay -->
+                    <div class="effect-section">
+                        <div class="effect-title">
+                            <span>⏱️ Delay (Gecikme)</span>
+                            <label class="effect-toggle">
+                                <input type="checkbox" id="delayEnabled" onchange="toggleEffect('delay')">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <div class="effect-controls">
+                            <div class="effect-knob">
+                                <label>Time (Süre)</label>
+                                <input type="range" id="delayTime" min="0" max="1000" value="300" oninput="applyEffects()">
+                                <span id="delayTimeVal">300 ms</span>
+                            </div>
+                            <div class="effect-knob">
+                                <label>Feedback (Geri Besleme)</label>
+                                <input type="range" id="delayFeedback" min="0" max="90" value="40" oninput="applyEffects()">
+                                <span id="delayFeedbackVal">40%</span>
+                            </div>
+                            <div class="effect-knob">
+                                <label>Mix (Karışım)</label>
+                                <input type="range" id="delayMix" min="0" max="100" value="25" oninput="applyEffects()">
+                                <span id="delayMixVal">25%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Autotune & Pitch -->
+                    <div class="effect-section ai-effect">
+                        <div class="effect-title">
+                            <span>🎤 Autotune & Pitch (Ses Düzeltme)</span>
+                            <label class="effect-toggle">
+                                <input type="checkbox" id="autotuneEnabled" onchange="toggleEffect('autotune')">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <div class="effect-controls">
+                            <div class="effect-knob">
+                                <label>Pitch Shift (Perde)</label>
+                                <input type="range" id="pitchShift" min="-12" max="12" value="0" oninput="applyEffects()">
+                                <span id="pitchShiftVal">0 st</span>
+                            </div>
+                            <div class="effect-knob">
+                                <label>Speed (Hız)</label>
+                                <input type="range" id="autotuneSpeed" min="0" max="100" value="50" oninput="applyEffects()">
+                                <span id="autotuneSpeedVal">50%</span>
+                            </div>
+                            <div class="effect-knob">
+                                <label>Key (Ton)</label>
+                                <select id="autotuneKey" onchange="applyEffects()" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); color: #fff; border-radius: 4px; padding: 4px;">
+                                    <option value="C">C Major</option>
+                                    <option value="Cm">C Minor</option>
+                                    <option value="D">D Major</option>
+                                    <option value="Dm">D Minor</option>
+                                    <option value="E">E Major</option>
+                                    <option value="Em">E Minor</option>
+                                    <option value="F">F Major</option>
+                                    <option value="Fm">F Minor</option>
+                                    <option value="G">G Major</option>
+                                    <option value="Gm">G Minor</option>
+                                    <option value="A">A Major</option>
+                                    <option value="Am" selected>A Minor</option>
+                                    <option value="B">B Major</option>
+                                    <option value="Bm">B Minor</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="autotune-presets">
+                            <button class="preset-btn" onclick="applyAutotunePreset('subtle')">Subtle (Hafif)</button>
+                            <button class="preset-btn" onclick="applyAutotunePreset('trap')">Trap (Sert)</button>
+                            <button class="preset-btn" onclick="applyAutotunePreset('tpain')">T-Pain</button>
+                            <button class="preset-btn" onclick="applyAutotunePreset('robotic')">Robotic (Robot)</button>
+                        </div>
+                    </div>
+
+                    <!-- De-Esser -->
+                    <div class="effect-section">
+                        <div class="effect-title">
+                            <span>🔇 De-Esser (Tıslama Giderici)</span>
+                            <label class="effect-toggle">
+                                <input type="checkbox" id="deesserEnabled" onchange="toggleEffect('deesser')">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <div class="effect-controls">
+                            <div class="effect-knob">
+                                <label>Frequency (Frekans)</label>
+                                <input type="range" id="deesserFreq" min="4000" max="10000" value="6000" oninput="applyEffects()">
+                                <span id="deesserFreqVal">6 kHz</span>
+                            </div>
+                            <div class="effect-knob">
+                                <label>Threshold (Eşik)</label>
+                                <input type="range" id="deesserThreshold" min="-40" max="0" value="-20" oninput="applyEffects()">
+                                <span id="deesserThresholdVal">-20 dB</span>
+                            </div>
+                            <div class="effect-knob">
+                                <label>Amount (Miktar)</label>
+                                <input type="range" id="deesserAmount" min="0" max="100" value="50" oninput="applyEffects()">
+                                <span id="deesserAmountVal">50%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Noise Gate -->
+                    <div class="effect-section">
+                        <div class="effect-title">
+                            <span>🚪 Noise Gate (Gürültü Kapısı)</span>
+                            <label class="effect-toggle">
+                                <input type="checkbox" id="noiseGateEnabled" onchange="toggleEffect('noiseGate')">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <div class="effect-controls">
+                            <div class="effect-knob">
+                                <label>Threshold (Eşik)</label>
+                                <input type="range" id="gateThreshold" min="-80" max="-20" value="-50" oninput="applyEffects()">
+                                <span id="gateThresholdVal">-50 dB</span>
+                            </div>
+                            <div class="effect-knob">
+                                <label>Attack (Başlangıç)</label>
+                                <input type="range" id="gateAttack" min="0" max="50" value="5" oninput="applyEffects()">
+                                <span id="gateAttackVal">5 ms</span>
+                            </div>
+                            <div class="effect-knob">
+                                <label>Release (Bırakma)</label>
+                                <input type="range" id="gateRelease" min="10" max="500" value="100" oninput="applyEffects()">
+                                <span id="gateReleaseVal">100 ms</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Voice Changer -->
+                    <div class="effect-section ai-effect">
+                        <div class="effect-title">
+                            <span>🎭 Voice Changer (Ses Değiştirici)</span>
+                            <label class="effect-toggle">
+                                <input type="checkbox" id="voiceChangerEnabled" onchange="toggleEffect('voiceChanger')">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <div class="voice-presets">
+                            <button class="voice-preset-btn" onclick="applyVoicePreset('normal')" data-preset="normal">
+                                <span>🎤</span>Normal
+                            </button>
+                            <button class="voice-preset-btn" onclick="applyVoicePreset('deep')" data-preset="deep">
+                                <span>🔊</span>Deep (Kalın)
+                            </button>
+                            <button class="voice-preset-btn" onclick="applyVoicePreset('high')" data-preset="high">
+                                <span>🔔</span>High (İnce)
+                            </button>
+                            <button class="voice-preset-btn" onclick="applyVoicePreset('chipmunk')" data-preset="chipmunk">
+                                <span>🐿️</span>Chipmunk (Sincap)
+                            </button>
+                            <button class="voice-preset-btn" onclick="applyVoicePreset('demon')" data-preset="demon">
+                                <span>👹</span>Demon (Şeytan)
+                            </button>
+                            <button class="voice-preset-btn" onclick="applyVoicePreset('radio')" data-preset="radio">
+                                <span>📻</span>Radio (Radyo)
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- AI Smart Mix -->
+                    <div class="effect-section ai-section">
+                        <div class="effect-title">
+                            <span>🧠 AI Smart Mix (Akıllı Karışım)</span>
+                            <span class="ai-badge">AI</span>
+                        </div>
+                        <p style="font-size: 11px; color: #888; margin-bottom: 12px;">Yapay zeka ile otomatik mix ayarları</p>
+                        <div class="ai-presets">
+                            <button class="ai-preset-btn" onclick="applyAIMix('vocal')">
+                                <span>🎤</span>
+                                <strong>Vokal Optimize</strong>
+                                <small>Netlik & Presence</small>
+                            </button>
+                            <button class="ai-preset-btn" onclick="applyAIMix('trap')">
+                                <span>🔥</span>
+                                <strong>Trap/Drill</strong>
+                                <small>Hard Autotune</small>
+                            </button>
+                            <button class="ai-preset-btn" onclick="applyAIMix('pop')">
+                                <span>✨</span>
+                                <strong>Pop Clean</strong>
+                                <small>Temiz & Parlak</small>
+                            </button>
+                            <button class="ai-preset-btn" onclick="applyAIMix('lofi')">
+                                <span>🌙</span>
+                                <strong>Lo-Fi</strong>
+                                <small>Vintage & Warm</small>
+                            </button>
+                            <button class="ai-preset-btn" onclick="applyAIMix('podcast')">
+                                <span>🎙️</span>
+                                <strong>Podcast</strong>
+                                <small>Konuşma Netliği</small>
+                            </button>
+                            <button class="ai-preset-btn" onclick="applyAIMix('master')">
+                                <span>💿</span>
+                                <strong>Auto Master</strong>
+                                <small>Final Mix</small>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Audio Context and Effect Nodes
+        let audioContext = null;
+        let masterGain = null;
+        let beatGain = null;
+        let vocalGain = null;
+        
+        // Effect nodes
+        let eqLow = null;
+        let eqMid = null;
+        let eqHigh = null;
+        let compressor = null;
+        let reverbNode = null;
+        let reverbGain = null;
+        let delayNode = null;
+        let delayFeedback = null;
+        let delayGain = null;
+        
+        // Audio source nodes
+        let beatSource = null;
+        let vocalSource = null;
+
+        // Audio elements
+        let beatAudio = new Audio();
+        let vocalAudio = new Audio();
+
+        // State
+        let isPlaying = false;
+        let isRecording = false;
+        let currentTime = 0;
+        let playInterval = null;
+        let timelineBlocks = { beat: [], vocal: [] };
+        
+        // Effect states
+        let effectStates = {
+            eq: true,
+            comp: true,
+            reverb: false,
+            delay: false,
+            autotune: false,
+            deesser: false,
+            noiseGate: false,
+            voiceChanger: false
+        };
+
+        // Initialize Audio with Effects
+        function initAudio() {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            
+            // Create gain nodes
+            masterGain = audioContext.createGain();
+            beatGain = audioContext.createGain();
+            vocalGain = audioContext.createGain();
+            
+            // Create EQ filters
+            eqLow = audioContext.createBiquadFilter();
+            eqLow.type = 'lowshelf';
+            eqLow.frequency.value = 320;
+            eqLow.gain.value = 0;
+            
+            eqMid = audioContext.createBiquadFilter();
+            eqMid.type = 'peaking';
+            eqMid.frequency.value = 1000;
+            eqMid.Q.value = 1;
+            eqMid.gain.value = 0;
+            
+            eqHigh = audioContext.createBiquadFilter();
+            eqHigh.type = 'highshelf';
+            eqHigh.frequency.value = 3200;
+            eqHigh.gain.value = 0;
+            
+            // Create Compressor
+            compressor = audioContext.createDynamicsCompressor();
+            compressor.threshold.value = -24;
+            compressor.knee.value = 30;
+            compressor.ratio.value = 4;
+            compressor.attack.value = 0.01;
+            compressor.release.value = 0.25;
+            
+            // Create Delay
+            delayNode = audioContext.createDelay(2);
+            delayNode.delayTime.value = 0.3;
+            delayFeedback = audioContext.createGain();
+            delayFeedback.gain.value = 0.4;
+            delayGain = audioContext.createGain();
+            delayGain.gain.value = 0;
+            
+            // Delay routing
+            delayNode.connect(delayFeedback);
+            delayFeedback.connect(delayNode);
+            delayNode.connect(delayGain);
+            
+            // Create Reverb
+            reverbGain = audioContext.createGain();
+            reverbGain.gain.value = 0;
+            createReverb(2);
+            
+            // Connect effect chain
+            // Input -> EQ -> Compressor -> Master -> Output
+            beatGain.connect(eqLow);
+            vocalGain.connect(eqLow);
+            
+            eqLow.connect(eqMid);
+            eqMid.connect(eqHigh);
+            eqHigh.connect(compressor);
+            compressor.connect(masterGain);
+            
+            // Parallel effects from compressor
+            compressor.connect(delayNode);
+            delayGain.connect(masterGain);
+            
+            if (reverbNode) {
+                compressor.connect(reverbNode);
+                reverbNode.connect(reverbGain);
+                reverbGain.connect(masterGain);
+            }
+            
+            masterGain.connect(audioContext.destination);
+
+            // Set initial gain values
+            masterGain.gain.value = 0.8;
+            beatGain.gain.value = 0.8;
+            vocalGain.gain.value = 0.85;
+            
+            // Connect audio elements to Web Audio
+            beatSource = audioContext.createMediaElementSource(beatAudio);
+            vocalSource = audioContext.createMediaElementSource(vocalAudio);
+            
+            beatSource.connect(beatGain);
+            vocalSource.connect(vocalGain);
+            
+            console.log('✅ Ses efektleri başlatıldı');
+        }
+        
+        // Create Reverb impulse response
+        function createReverb(duration) {
+            const sampleRate = audioContext ? audioContext.sampleRate : 44100;
+            const length = sampleRate * duration;
+            const impulse = audioContext.createBuffer(2, length, sampleRate);
+            
+            for (let channel = 0; channel < 2; channel++) {
+                const channelData = impulse.getChannelData(channel);
+                for (let i = 0; i < length; i++) {
+                    channelData[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / length, 2);
+                }
+            }
+            
+            reverbNode = audioContext.createConvolver();
+            reverbNode.buffer = impulse;
+        }
+        
+        // Apply effects based on UI controls
+        function applyEffects() {
+            // EQ values - always update display
+            const eqLowVal = parseFloat(document.getElementById('eqLow').value);
+            const eqMidVal = parseFloat(document.getElementById('eqMid').value);
+            const eqHighVal = parseFloat(document.getElementById('eqHigh').value);
+            
+            document.getElementById('eqLowVal').textContent = eqLowVal + ' dB';
+            document.getElementById('eqMidVal').textContent = eqMidVal + ' dB';
+            document.getElementById('eqHighVal').textContent = eqHighVal + ' dB';
+            
+            // Compressor values - always update display
+            const threshold = parseFloat(document.getElementById('compThreshold').value);
+            const ratio = parseFloat(document.getElementById('compRatio').value);
+            const attack = parseFloat(document.getElementById('compAttack').value) / 1000;
+            const release = parseFloat(document.getElementById('compRelease').value) / 1000;
+            
+            document.getElementById('compThresholdVal').textContent = threshold + ' dB';
+            document.getElementById('compRatioVal').textContent = ratio + ':1';
+            document.getElementById('compAttackVal').textContent = (attack * 1000).toFixed(0) + ' ms';
+            document.getElementById('compReleaseVal').textContent = (release * 1000).toFixed(0) + ' ms';
+            
+            // Reverb values - always update display
+            const reverbMix = parseFloat(document.getElementById('reverbMix').value) / 100;
+            const reverbDecay = parseFloat(document.getElementById('reverbDecay').value);
+            
+            document.getElementById('reverbMixVal').textContent = (reverbMix * 100).toFixed(0) + '%';
+            document.getElementById('reverbDecayVal').textContent = reverbDecay.toFixed(1) + ' s';
+            
+            // Delay values - always update display
+            const delayTimeVal = parseFloat(document.getElementById('delayTime').value) / 1000;
+            const delayFeedbackVal = parseFloat(document.getElementById('delayFeedback').value) / 100;
+            const delayMixVal = parseFloat(document.getElementById('delayMix').value) / 100;
+            
+            document.getElementById('delayTimeVal').textContent = (delayTimeVal * 1000).toFixed(0) + ' ms';
+            document.getElementById('delayFeedbackVal').textContent = (delayFeedbackVal * 100).toFixed(0) + '%';
+            document.getElementById('delayMixVal').textContent = (delayMixVal * 100).toFixed(0) + '%';
+            
+            // Autotune & Pitch - always update display
+            const pitchShift = parseFloat(document.getElementById('pitchShift').value);
+            const autotuneSpeed = parseFloat(document.getElementById('autotuneSpeed').value);
+            
+            document.getElementById('pitchShiftVal').textContent = pitchShift + ' st';
+            document.getElementById('autotuneSpeedVal').textContent = autotuneSpeed + '%';
+            
+            // De-Esser - always update display
+            const deesserFreq = parseFloat(document.getElementById('deesserFreq').value);
+            const deesserThreshold = parseFloat(document.getElementById('deesserThreshold').value);
+            const deesserAmount = parseFloat(document.getElementById('deesserAmount').value);
+            
+            document.getElementById('deesserFreqVal').textContent = (deesserFreq / 1000).toFixed(1) + ' kHz';
+            document.getElementById('deesserThresholdVal').textContent = deesserThreshold + ' dB';
+            document.getElementById('deesserAmountVal').textContent = deesserAmount + '%';
+            
+            // Noise Gate - always update display
+            const gateThreshold = parseFloat(document.getElementById('gateThreshold').value);
+            const gateAttack = parseFloat(document.getElementById('gateAttack').value);
+            const gateRelease = parseFloat(document.getElementById('gateRelease').value);
+            
+            document.getElementById('gateThresholdVal').textContent = gateThreshold + ' dB';
+            document.getElementById('gateAttackVal').textContent = gateAttack + ' ms';
+            document.getElementById('gateReleaseVal').textContent = gateRelease + ' ms';
+            
+            // Apply to audio nodes only if audioContext exists
+            if (!audioContext) return;
+            
+            // Apply EQ
+            if (effectStates.eq && eqLow && eqMid && eqHigh) {
+                eqLow.gain.value = eqLowVal;
+                eqMid.gain.value = eqMidVal;
+                eqHigh.gain.value = eqHighVal;
+            } else if (eqLow && eqMid && eqHigh) {
+                eqLow.gain.value = 0;
+                eqMid.gain.value = 0;
+                eqHigh.gain.value = 0;
+            }
+            
+            // Apply Compressor
+            if (effectStates.comp && compressor) {
+                compressor.threshold.value = threshold;
+                compressor.ratio.value = ratio;
+                compressor.attack.value = attack;
+                compressor.release.value = release;
+            } else if (compressor) {
+                compressor.threshold.value = 0;
+                compressor.ratio.value = 1;
+            }
+            
+            // Apply Reverb
+            if (effectStates.reverb && reverbGain) {
+                reverbGain.gain.value = reverbMix;
+            } else if (reverbGain) {
+                reverbGain.gain.value = 0;
+            }
+            
+            // Apply Delay
+            if (effectStates.delay && delayNode && delayFeedback && delayGain) {
+                delayNode.delayTime.value = delayTimeVal;
+                delayFeedback.gain.value = delayFeedbackVal;
+                delayGain.gain.value = delayMixVal;
+            } else if (delayGain) {
+                delayGain.gain.value = 0;
+            }
+        }
+        
+        // Toggle effect on/off
+        function toggleEffect(effect) {
+            effectStates[effect] = document.getElementById(effect + 'Enabled').checked;
+            applyEffects();
+            console.log(`${effect} ${effectStates[effect] ? 'açık' : 'kapalı'}`);
+        }
+        
+        // Update compressor meter
+        function updateCompMeter() {
+            if (compressor && isPlaying) {
+                const reduction = Math.abs(compressor.reduction);
+                const percent = Math.min(reduction * 5, 100);
+                document.getElementById('compMeter').style.width = percent + '%';
+            }
+        }
+        
+        // Autotune Presets
+        function applyAutotunePreset(preset) {
+            document.querySelectorAll('.preset-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            const pitchSlider = document.getElementById('pitchShift');
+            const speedSlider = document.getElementById('autotuneSpeed');
+            const enableCheck = document.getElementById('autotuneEnabled');
+            
+            enableCheck.checked = true;
+            effectStates.autotune = true;
+            
+            switch(preset) {
+                case 'subtle':
+                    pitchSlider.value = 0;
+                    speedSlider.value = 30;
+                    break;
+                case 'trap':
+                    pitchSlider.value = 0;
+                    speedSlider.value = 80;
+                    break;
+                case 'tpain':
+                    pitchSlider.value = 2;
+                    speedSlider.value = 100;
+                    break;
+                case 'robotic':
+                    pitchSlider.value = 0;
+                    speedSlider.value = 100;
+                    break;
+            }
+            
+            applyEffects();
+            console.log(`🎤 Autotune preset: ${preset}`);
+        }
+        
+        // Voice Changer Presets
+        function applyVoicePreset(preset) {
+            document.querySelectorAll('.voice-preset-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`[data-preset="${preset}"]`).classList.add('active');
+            
+            const enableCheck = document.getElementById('voiceChangerEnabled');
+            enableCheck.checked = true;
+            effectStates.voiceChanger = true;
+            
+            const pitchSlider = document.getElementById('pitchShift');
+            const eqLowSlider = document.getElementById('eqLow');
+            const eqHighSlider = document.getElementById('eqHigh');
+            
+            switch(preset) {
+                case 'normal':
+                    pitchSlider.value = 0;
+                    eqLowSlider.value = 0;
+                    eqHighSlider.value = 0;
+                    break;
+                case 'deep':
+                    pitchSlider.value = -5;
+                    eqLowSlider.value = 6;
+                    eqHighSlider.value = -3;
+                    break;
+                case 'high':
+                    pitchSlider.value = 5;
+                    eqLowSlider.value = -3;
+                    eqHighSlider.value = 4;
+                    break;
+                case 'chipmunk':
+                    pitchSlider.value = 12;
+                    eqLowSlider.value = -6;
+                    eqHighSlider.value = 6;
+                    break;
+                case 'demon':
+                    pitchSlider.value = -12;
+                    eqLowSlider.value = 8;
+                    eqHighSlider.value = -4;
+                    break;
+                case 'radio':
+                    pitchSlider.value = 0;
+                    eqLowSlider.value = -8;
+                    eqHighSlider.value = 6;
+                    document.getElementById('compThreshold').value = -30;
+                    document.getElementById('compRatio').value = 8;
+                    break;
+            }
+            
+            applyEffects();
+            console.log(`🎭 Voice preset: ${preset}`);
+        }
+        
+        // AI Smart Mix Presets
+        function applyAIMix(preset) {
+            document.querySelectorAll('.ai-preset-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.closest('.ai-preset-btn').classList.add('active');
+            
+            // Reset all effects first
+            document.getElementById('eqLow').value = 0;
+            document.getElementById('eqMid').value = 0;
+            document.getElementById('eqHigh').value = 0;
+            document.getElementById('compThreshold').value = -24;
+            document.getElementById('compRatio').value = 4;
+            document.getElementById('reverbMix').value = 30;
+            document.getElementById('delayMix').value = 25;
+            
+            switch(preset) {
+                case 'vocal':
+                    // Vokal Optimize - Netlik & Presence
+                    document.getElementById('eqEnabled').checked = true;
+                    document.getElementById('compEnabled').checked = true;
+                    document.getElementById('deesserEnabled').checked = true;
+                    
+                    document.getElementById('eqLow').value = -2;
+                    document.getElementById('eqMid').value = 2;
+                    document.getElementById('eqHigh').value = 3;
+                    document.getElementById('compThreshold').value = -20;
+                    document.getElementById('compRatio').value = 4;
+                    document.getElementById('compAttack').value = 10;
+                    document.getElementById('compRelease').value = 150;
+                    document.getElementById('deesserFreq').value = 6500;
+                    document.getElementById('deesserAmount').value = 60;
+                    
+                    effectStates.eq = true;
+                    effectStates.comp = true;
+                    effectStates.deesser = true;
+                    break;
+                    
+                case 'trap':
+                    // Trap/Drill - Hard Autotune
+                    document.getElementById('autotuneEnabled').checked = true;
+                    document.getElementById('eqEnabled').checked = true;
+                    document.getElementById('compEnabled').checked = true;
+                    document.getElementById('reverbEnabled').checked = true;
+                    document.getElementById('delayEnabled').checked = true;
+                    
+                    document.getElementById('pitchShift').value = 0;
+                    document.getElementById('autotuneSpeed').value = 90;
+                    document.getElementById('eqLow').value = -3;
+                    document.getElementById('eqMid').value = 1;
+                    document.getElementById('eqHigh').value = 4;
+                    document.getElementById('compThreshold').value = -18;
+                    document.getElementById('compRatio').value = 6;
+                    document.getElementById('reverbMix').value = 20;
+                    document.getElementById('reverbDecay').value = 1.2;
+                    document.getElementById('delayTime').value = 250;
+                    document.getElementById('delayMix').value = 15;
+                    
+                    effectStates.autotune = true;
+                    effectStates.eq = true;
+                    effectStates.comp = true;
+                    effectStates.reverb = true;
+                    effectStates.delay = true;
+                    break;
+                    
+                case 'pop':
+                    // Pop Clean - Temiz & Parlak
+                    document.getElementById('eqEnabled').checked = true;
+                    document.getElementById('compEnabled').checked = true;
+                    document.getElementById('autotuneEnabled').checked = true;
+                    document.getElementById('reverbEnabled').checked = true;
+                    
+                    document.getElementById('eqLow').value = 0;
+                    document.getElementById('eqMid').value = 1;
+                    document.getElementById('eqHigh').value = 5;
+                    document.getElementById('compThreshold').value = -22;
+                    document.getElementById('compRatio').value = 3;
+                    document.getElementById('autotuneSpeed').value = 50;
+                    document.getElementById('reverbMix').value = 25;
+                    document.getElementById('reverbDecay').value = 1.8;
+                    
+                    effectStates.eq = true;
+                    effectStates.comp = true;
+                    effectStates.autotune = true;
+                    effectStates.reverb = true;
+                    break;
+                    
+                case 'lofi':
+                    // Lo-Fi - Vintage & Warm
+                    document.getElementById('eqEnabled').checked = true;
+                    document.getElementById('compEnabled').checked = true;
+                    
+                    document.getElementById('eqLow').value = 4;
+                    document.getElementById('eqMid').value = -2;
+                    document.getElementById('eqHigh').value = -6;
+                    document.getElementById('compThreshold').value = -30;
+                    document.getElementById('compRatio').value = 8;
+                    
+                    effectStates.eq = true;
+                    effectStates.comp = true;
+                    break;
+                    
+                case 'podcast':
+                    // Podcast - Konuşma Netliği
+                    document.getElementById('eqEnabled').checked = true;
+                    document.getElementById('compEnabled').checked = true;
+                    document.getElementById('noiseGateEnabled').checked = true;
+                    document.getElementById('deesserEnabled').checked = true;
+                    
+                    document.getElementById('eqLow').value = -4;
+                    document.getElementById('eqMid').value = 3;
+                    document.getElementById('eqHigh').value = 2;
+                    document.getElementById('compThreshold').value = -24;
+                    document.getElementById('compRatio').value = 5;
+                    document.getElementById('compAttack').value = 5;
+                    document.getElementById('compRelease').value = 200;
+                    document.getElementById('gateThreshold').value = -45;
+                    document.getElementById('deesserAmount').value = 70;
+                    
+                    effectStates.eq = true;
+                    effectStates.comp = true;
+                    effectStates.noiseGate = true;
+                    effectStates.deesser = true;
+                    break;
+                    
+                case 'master':
+                    // Auto Master - Final Mix
+                    document.getElementById('eqEnabled').checked = true;
+                    document.getElementById('compEnabled').checked = true;
+                    
+                    document.getElementById('eqLow').value = 1;
+                    document.getElementById('eqMid').value = 0;
+                    document.getElementById('eqHigh').value = 2;
+                    document.getElementById('compThreshold').value = -12;
+                    document.getElementById('compRatio').value = 3;
+                    document.getElementById('compAttack').value = 20;
+                    document.getElementById('compRelease').value = 300;
+                    
+                    // Mastering limiter (use compressor aggressively)
+                    effectStates.eq = true;
+                    effectStates.comp = true;
+                    break;
+            }
+            
+            applyEffects();
+            showNotification(`🧠 AI Mix: ${preset} uygulandı!`);
+            console.log(`🧠 AI Mix preset: ${preset}`);
+        }
+        
+        // Show notification
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 80px;
+                right: 20px;
+                background: linear-gradient(135deg, #00c896, #00a080);
+                color: white;
+                padding: 12px 20px;
+                border-radius: 10px;
+                font-size: 14px;
+                font-weight: 600;
+                z-index: 1000;
+                animation: slideIn 0.3s ease;
+                box-shadow: 0 4px 20px rgba(0, 200, 150, 0.4);
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 2000);
+        }
+        
+        // Filter beats by genre
+        function filterBeats(genre, button) {
+            // Update active state on buttons
+            document.querySelectorAll('.genre-tag').forEach(tag => tag.classList.remove('active'));
+            button.classList.add('active');
+            
+            // Filter beats
+            const beatItems = document.querySelectorAll('#beatsList .track-item');
+            beatItems.forEach(item => {
+                if (genre === 'all' || item.dataset.genre === genre) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+            
+            console.log(`🎵 Filtre: ${genre}`);
+        }
+
+        // Add to timeline
+        function addToTimeline(element) {
+            const type = element.dataset.type;
+            const id = element.dataset.id;
+            const url = element.dataset.url;
+            const name = element.dataset.name;
+            const duration = element.dataset.duration || '3:00';
+
+            const trackContent = document.getElementById(type === 'beat' ? 'beatTrackContent' : 'vocalTrackContent');
+            
+            // Calculate position (for now, add at the end)
+            const existingBlocks = trackContent.querySelectorAll('.audio-block');
+            let leftPos = 0;
+            existingBlocks.forEach(block => {
+                const blockRight = parseFloat(block.style.left) + parseFloat(block.style.width);
+                if (blockRight > leftPos) leftPos = blockRight;
+            });
+
+            // Create unique block ID
+            const blockId = 'block_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+
+            // Create block
+            const block = document.createElement('div');
+            block.className = `audio-block ${type}-block`;
+            block.style.left = leftPos + 'px';
+            block.style.width = '200px'; // Default width
+            block.dataset.url = url;
+            block.dataset.name = name;
+            block.dataset.blockId = blockId;
+            block.dataset.volume = '100';
+            block.dataset.loop = 'false';
+            block.dataset.type = type;
+
+            block.innerHTML = `
+                <canvas class="waveform-mini"></canvas>
+                <span class="loop-indicator">🔁</span>
+                <span class="block-name">${name}</span>
+                <div class="block-controls">
+                    <span class="block-volume-label">🔊</span>
+                    <input type="range" class="block-volume" min="0" max="100" value="100" 
+                           oninput="updateBlockVolume('${blockId}', this.value)" title="Ses Seviyesi">
+                    <button class="block-loop-btn" onclick="toggleBlockLoop('${blockId}', this)" title="Tekrarla">🔁</button>
+                </div>
+                <button class="delete-block" onclick="deleteBlock(this.parentElement)">×</button>
+                <div class="block-resize-handle" onmousedown="startResize(event, this.parentElement)"></div>
+            `;
+
+            // Make draggable
+            block.draggable = true;
+            block.addEventListener('dragstart', handleDragStart);
+            block.addEventListener('dragend', handleDragEnd);
+
+            trackContent.appendChild(block);
+
+            // Mark source as used
+            element.classList.add('in-timeline');
+
+            // Store reference
+            timelineBlocks[type].push({ url, name, element: block, id: blockId, volume: 1, loop: false });
+
+            // Draw mini waveform
+            drawMiniWaveform(block.querySelector('.waveform-mini'));
+            
+            console.log(`✅ Timeline'a eklendi: ${name}`);
+        }
+
+        // Update block volume
+        function updateBlockVolume(blockId, value) {
+            // Find block in timelineBlocks
+            for (let type of ['beat', 'vocal']) {
+                const block = timelineBlocks[type].find(b => b.id === blockId);
+                if (block) {
+                    block.volume = value / 100;
+                    block.element.dataset.volume = value;
+                    
+                    // Update playing audio volume if this block is playing
+                    if (type === 'beat' && beatAudio.src.includes(block.url)) {
+                        if (beatGain) beatGain.gain.value = block.volume * (document.getElementById('beatFader').value / 100);
+                    } else if (type === 'vocal' && vocalAudio.src.includes(block.url)) {
+                        if (vocalGain) vocalGain.gain.value = block.volume * (document.getElementById('vocalFader').value / 100);
+                    }
+                    break;
+                }
+            }
+        }
+
+        // Toggle block loop
+        function toggleBlockLoop(blockId, button) {
+            for (let type of ['beat', 'vocal']) {
+                const block = timelineBlocks[type].find(b => b.id === blockId);
+                if (block) {
+                    block.loop = !block.loop;
+                    block.element.dataset.loop = block.loop;
+                    button.classList.toggle('active', block.loop);
+                    block.element.classList.toggle('looping', block.loop);
+                    
+                    // Update playing audio loop setting
+                    if (type === 'beat') {
+                        beatAudio.loop = block.loop;
+                    } else if (type === 'vocal') {
+                        vocalAudio.loop = block.loop;
+                    }
+                    
+                    console.log(`🔁 Loop ${block.loop ? 'açık' : 'kapalı'}: ${block.name}`);
+                    break;
+                }
+            }
+        }
+
+        // Resize block
+        let isResizing = false;
+        let resizeBlock = null;
+        let startX = 0;
+        let startWidth = 0;
+
+        function startResize(e, block) {
+            e.preventDefault();
+            e.stopPropagation();
+            isResizing = true;
+            resizeBlock = block;
+            startX = e.clientX;
+            startWidth = parseInt(block.style.width) || 200;
+            
+            document.addEventListener('mousemove', doResize);
+            document.addEventListener('mouseup', stopResize);
+        }
+
+        function doResize(e) {
+            if (!isResizing || !resizeBlock) return;
+            
+            const diff = e.clientX - startX;
+            const newWidth = Math.max(50, startWidth + diff); // Minimum 50px
+            resizeBlock.style.width = newWidth + 'px';
+            
+            // Redraw waveform
+            const canvas = resizeBlock.querySelector('.waveform-mini');
+            if (canvas) {
+                canvas.width = newWidth;
+                drawMiniWaveform(canvas);
+            }
+        }
+
+        function stopResize() {
+            isResizing = false;
+            resizeBlock = null;
+            document.removeEventListener('mousemove', doResize);
+            document.removeEventListener('mouseup', stopResize);
+        }
+
+        function deleteBlock(block) {
+            // Remove from timelineBlocks
+            const blockId = block.dataset.blockId;
+            for (let type of ['beat', 'vocal']) {
+                const index = timelineBlocks[type].findIndex(b => b.id === blockId);
+                if (index > -1) {
+                    timelineBlocks[type].splice(index, 1);
+                    break;
+                }
+            }
+            block.remove();
+        }
+
+        function handleDragStart(e) {
+            e.dataTransfer.setData('text/plain', '');
+            this.style.opacity = '0.5';
+        }
+
+        function handleDragEnd(e) {
+            this.style.opacity = '1';
+        }
+
+        // Draw mini waveform (decorative)
+        function drawMiniWaveform(canvas) {
+            const ctx = canvas.getContext('2d');
+            canvas.width = 200;
+            canvas.height = 60;
+
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+
+            for (let i = 0; i < 100; i++) {
+                const height = Math.random() * 40 + 10;
+                ctx.fillRect(i * 2, (60 - height) / 2, 1, height);
+            }
+        }
+
+        // Playback controls
+        function togglePlayback() {
+            if (isPlaying) {
+                pausePlayback();
+            } else {
+                startPlayback();
+            }
+        }
+
+        function startPlayback() {
+            if (!audioContext) initAudio();
+            if (audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+            
+            isPlaying = true;
+            document.getElementById('playBtn').classList.add('playing');
+            document.getElementById('playBtn').textContent = '⏸️';
+
+            // Apply current effects
+            applyEffects();
+
+            // Play all audio in timeline with their settings
+            const beatBlocks = document.querySelectorAll('#beatTrackContent .audio-block');
+            const vocalBlocks = document.querySelectorAll('#vocalTrackContent .audio-block');
+
+            if (beatBlocks.length > 0) {
+                const firstBeatBlock = beatBlocks[0];
+                const blockData = timelineBlocks.beat.find(b => b.id === firstBeatBlock.dataset.blockId);
+                
+                beatAudio.src = firstBeatBlock.dataset.url;
+                beatAudio.loop = blockData ? blockData.loop : (firstBeatBlock.dataset.loop === 'true');
+                
+                // Apply block volume
+                const blockVolume = blockData ? blockData.volume : (parseInt(firstBeatBlock.dataset.volume || 100) / 100);
+                const faderVolume = document.getElementById('beatFader').value / 100;
+                if (beatGain) beatGain.gain.value = blockVolume * faderVolume;
+                
+                beatAudio.play().catch(e => console.log('Beat play error:', e));
+            }
+
+            if (vocalBlocks.length > 0) {
+                const firstVocalBlock = vocalBlocks[0];
+                const blockData = timelineBlocks.vocal.find(b => b.id === firstVocalBlock.dataset.blockId);
+                
+                vocalAudio.src = firstVocalBlock.dataset.url;
+                vocalAudio.loop = blockData ? blockData.loop : (firstVocalBlock.dataset.loop === 'true');
+                
+                // Apply block volume
+                const blockVolume = blockData ? blockData.volume : (parseInt(firstVocalBlock.dataset.volume || 100) / 100);
+                const faderVolume = document.getElementById('vocalFader').value / 100;
+                if (vocalGain) vocalGain.gain.value = blockVolume * faderVolume;
+                
+                vocalAudio.play().catch(e => console.log('Vocal play error:', e));
+            }
+
+            // Start timer
+            const startTime = Date.now() - currentTime * 1000;
+            playInterval = setInterval(() => {
+                currentTime = (Date.now() - startTime) / 1000;
+                updateTimeDisplay();
+                updatePlayhead();
+                updateMeters();
+                updateCompMeter();
+            }, 50);
+        }
+
+        function pausePlayback() {
+            isPlaying = false;
+            document.getElementById('playBtn').classList.remove('playing');
+            document.getElementById('playBtn').textContent = '▶️';
+
+            beatAudio.pause();
+            vocalAudio.pause();
+
+            clearInterval(playInterval);
+        }
+
+        function stopPlayback() {
+            pausePlayback();
+            currentTime = 0;
+            updateTimeDisplay();
+            updatePlayhead();
+
+            beatAudio.currentTime = 0;
+            vocalAudio.currentTime = 0;
+        }
+
+        function toggleRecord() {
+            isRecording = !isRecording;
+            const btn = document.getElementById('recordBtn');
+            
+            if (isRecording) {
+                btn.classList.add('recording');
+                // Start recording logic here
+                alert('🎙️ Kayıt başladı! Stüdyo sayfasında daha detaylı kayıt yapabilirsiniz.');
+            } else {
+                btn.classList.remove('recording');
+            }
+        }
+
+        function updateTimeDisplay() {
+            const minutes = Math.floor(currentTime / 60);
+            const seconds = Math.floor(currentTime % 60);
+            const ms = Math.floor((currentTime % 1) * 100);
+            document.getElementById('timeDisplay').textContent = 
+                `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}:${String(ms).padStart(2, '0')}`;
+        }
+
+        function updatePlayhead() {
+            const playhead = document.getElementById('playhead');
+            const maxWidth = document.getElementById('beatTrackContent').offsetWidth;
+            const position = Math.min((currentTime / 210) * maxWidth, maxWidth); // 3:30 = 210 seconds
+            playhead.style.left = (100 + position) + 'px';
+        }
+
+        function updateMeters() {
+            // Simulate meter movement
+            const beatMeter = document.getElementById('beatMeter');
+            const vocalMeter = document.getElementById('vocalMeter');
+            const masterMeter = document.getElementById('masterMeter');
+
+            if (isPlaying) {
+                beatMeter.style.height = (40 + Math.random() * 40) + '%';
+                vocalMeter.style.height = (30 + Math.random() * 50) + '%';
+                masterMeter.style.height = (50 + Math.random() * 35) + '%';
+            } else {
+                beatMeter.style.height = '5%';
+                vocalMeter.style.height = '5%';
+                masterMeter.style.height = '5%';
+            }
+        }
+
+        // Volume controls
+        function updateBeatVolume(value) {
+            if (beatGain) {
+                // Get current playing block's volume
+                const beatBlocks = document.querySelectorAll('#beatTrackContent .audio-block');
+                let blockVolume = 1;
+                if (beatBlocks.length > 0) {
+                    blockVolume = parseInt(beatBlocks[0].dataset.volume || 100) / 100;
+                }
+                beatGain.gain.value = (value / 100) * blockVolume;
+            }
+        }
+
+        function updateVocalVolume(value) {
+            if (vocalGain) {
+                // Get current playing block's volume
+                const vocalBlocks = document.querySelectorAll('#vocalTrackContent .audio-block');
+                let blockVolume = 1;
+                if (vocalBlocks.length > 0) {
+                    blockVolume = parseInt(vocalBlocks[0].dataset.volume || 100) / 100;
+                }
+                vocalGain.gain.value = (value / 100) * blockVolume;
+            }
+        }
+
+        document.getElementById('masterVolume').addEventListener('input', function() {
+            const value = this.value;
+            document.getElementById('masterVolumeValue').textContent = value + '%';
+            if (masterGain) {
+                masterGain.gain.value = value / 100;
+            }
+        });
+
+        // Master fader
+        document.getElementById('masterFader').addEventListener('input', function() {
+            const value = this.value;
+            if (masterGain) {
+                masterGain.gain.value = value / 100;
+            }
+            document.getElementById('masterVolume').value = value;
+            document.getElementById('masterVolumeValue').textContent = value + '%';
+        });
+
+        // Mute/Solo
+        let muteState = { beat: false, vocal: false };
+        let soloState = { beat: false, vocal: false };
+
+        function toggleMute(track) {
+            muteState[track] = !muteState[track];
+            
+            document.querySelectorAll(`.mute-btn`).forEach(btn => {
+                if (btn.closest('.channel-strip')?.querySelector('.channel-name')?.textContent.toLowerCase().includes(track) ||
+                    btn.closest('.track-label')?.textContent.toLowerCase().includes(track === 'beat' ? '🎹' : '🎤')) {
+                    btn.classList.toggle('active', muteState[track]);
+                }
+            });
+
+            if (track === 'beat') {
+                if (beatGain) beatGain.gain.value = muteState[track] ? 0 : document.getElementById('beatFader').value / 100;
+            } else {
+                if (vocalGain) vocalGain.gain.value = muteState[track] ? 0 : document.getElementById('vocalFader').value / 100;
+            }
+        }
+
+        function toggleSolo(track) {
+            soloState[track] = !soloState[track];
+            
+            document.querySelectorAll(`.solo-btn`).forEach(btn => {
+                if (btn.closest('.channel-strip')?.querySelector('.channel-name')?.textContent.toLowerCase().includes(track) ||
+                    btn.closest('.track-label')?.textContent.toLowerCase().includes(track === 'beat' ? '🎹' : '🎤')) {
+                    btn.classList.toggle('active', soloState[track]);
+                }
+            });
+
+            // Solo logic: mute other tracks using gain nodes
+            if (soloState.beat && !soloState.vocal) {
+                if (vocalGain) vocalGain.gain.value = 0;
+                if (beatGain && !muteState.beat) beatGain.gain.value = document.getElementById('beatFader').value / 100;
+            } else if (soloState.vocal && !soloState.beat) {
+                if (beatGain) beatGain.gain.value = 0;
+                if (vocalGain && !muteState.vocal) vocalGain.gain.value = document.getElementById('vocalFader').value / 100;
+            } else {
+                if (beatGain) beatGain.gain.value = muteState.beat ? 0 : document.getElementById('beatFader').value / 100;
+                if (vocalGain) vocalGain.gain.value = muteState.vocal ? 0 : document.getElementById('vocalFader').value / 100;
+            }
+        }
+
+        // Clear timeline
+        function clearTimeline() {
+            const beatContent = document.getElementById('beatTrackContent');
+            const vocalContent = document.getElementById('vocalTrackContent');
+            
+            // Clear all audio blocks
+            beatContent.innerHTML = '';
+            vocalContent.innerHTML = '';
+            timelineBlocks = { beat: [], vocal: [] };
+            
+            // Stop playback
+            stopPlayback();
+            
+            // Remove in-timeline class from track items
+            document.querySelectorAll('.track-item.in-timeline').forEach(item => {
+                item.classList.remove('in-timeline');
+            });
+            
+            // Show feedback
+            alert('✅ Timeline temizlendi!');
+        }
+
+        // Export mix
+        function exportMix() {
+            alert('🎵 Mix dışa aktarılıyor...\n\nBu özellik yakında aktif olacak! Şimdilik timeline\'daki sesleri ayrı ayrı indirebilirsiniz.');
+        }
+
+        // File upload
+        function handleFileUpload(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const url = URL.createObjectURL(file);
+            const name = file.name.replace(/\.[^/.]+$/, '');
+
+            // Add to recordings list
+            const recordingsList = document.getElementById('recordingsList');
+            const emptyState = recordingsList.querySelector('.empty-state');
+            if (emptyState) emptyState.remove();
+
+            const item = document.createElement('div');
+            item.className = 'track-item';
+            item.dataset.type = 'vocal';
+            item.dataset.url = url;
+            item.dataset.name = name;
+            item.innerHTML = `
+                <div class="track-icon vocal">🎤</div>
+                <div class="track-info">
+                    <div class="track-name">${name}</div>
+                    <div class="track-meta">Yüklenen dosya</div>
+                </div>
+                <button class="track-add-btn" onclick="addToTimeline(this.parentElement)">+</button>
+                <button class="track-delete-btn" onclick="deleteUploadedFile(this.parentElement)" title="Sil">🗑️</button>
+            `;
+
+            recordingsList.appendChild(item);
+        }
+
+        // Load saved recordings from localStorage
+        function loadSavedRecordings() {
+            try {
+                const savedRecordings = JSON.parse(localStorage.getItem('fonix_recordings') || '[]');
+                
+                if (savedRecordings.length === 0) {
+                    console.log('📭 localStorage\'da kayıt bulunamadı');
+                    return;
+                }
+                
+                const recordingsList = document.getElementById('recordingsList');
+                const emptyState = recordingsList.querySelector('.empty-state');
+                if (emptyState) emptyState.remove();
+                
+                savedRecordings.forEach(rec => {
+                    const item = document.createElement('div');
+                    item.className = 'track-item';
+                    item.dataset.type = 'vocal';
+                    item.dataset.url = rec.data; // base64 data URL
+                    item.dataset.name = rec.name;
+                    item.dataset.id = rec.id;
+                    item.innerHTML = `
+                        <div class="track-icon vocal">🎤</div>
+                        <div class="track-info">
+                            <div class="track-name">${rec.name}</div>
+                            <div class="track-meta">${rec.duration} • ${rec.date}</div>
+                        </div>
+                        <button class="track-add-btn" onclick="addToTimeline(this.parentElement)">+</button>
+                        <button class="track-delete-btn" onclick="deleteRecording('${rec.id}', this.parentElement)" title="Sil">🗑️</button>
+                    `;
+                    recordingsList.appendChild(item);
+                });
+                
+                console.log(`✅ ${savedRecordings.length} kayıt yüklendi`);
+            } catch (e) {
+                console.error('localStorage yükleme hatası:', e);
+            }
+        }
+
+        // Delete recording from localStorage
+        function deleteRecording(recordingId, element) {
+            try {
+                const savedRecordings = JSON.parse(localStorage.getItem('fonix_recordings') || '[]');
+                // String'e çevirerek karşılaştır (tip uyumsuzluğunu önle)
+                const updatedRecordings = savedRecordings.filter(rec => String(rec.id) !== String(recordingId));
+                localStorage.setItem('fonix_recordings', JSON.stringify(updatedRecordings));
+                
+                // Remove element from UI with animation
+                element.style.transition = 'all 0.3s ease';
+                element.style.transform = 'translateX(-100%)';
+                element.style.opacity = '0';
+                
+                setTimeout(() => {
+                    element.remove();
+                    
+                    // Show empty state if no recordings left
+                    const recordingsList = document.getElementById('recordingsList');
+                    if (recordingsList.children.length === 0) {
+                        recordingsList.innerHTML = `
+                            <div class="empty-state" style="padding: 20px; text-align: center; color: #666;">
+                                <p>Henüz kayıt yok.</p>
+                                <p style="font-size: 12px; margin-top: 8px;">Stüdyo'da kayıt yapın veya dosya yükleyin.</p>
+                            </div>
+                        `;
+                    }
+                }, 300);
+                
+                console.log(`🗑️ Kayıt silindi: ${recordingId}`);
+            } catch (e) {
+                console.error('Silme hatası:', e);
+            }
+        }
+
+        // Delete uploaded file (not in localStorage)
+        function deleteUploadedFile(element) {
+            // Revoke object URL to free memory
+            if (element.dataset.url && element.dataset.url.startsWith('blob:')) {
+                URL.revokeObjectURL(element.dataset.url);
+            }
+            
+            // Remove element from UI with animation
+            element.style.transition = 'all 0.3s ease';
+            element.style.transform = 'translateX(-100%)';
+            element.style.opacity = '0';
+            
+            setTimeout(() => {
+                element.remove();
+                
+                // Show empty state if no recordings left
+                const recordingsList = document.getElementById('recordingsList');
+                if (recordingsList.children.length === 0) {
+                    recordingsList.innerHTML = `
+                        <div class="empty-state" style="padding: 20px; text-align: center; color: #666;">
+                            <p>Henüz kayıt yok.</p>
+                            <p style="font-size: 12px; margin-top: 8px;">Stüdyo'da kayıt yapın veya dosya yükleyin.</p>
+                        </div>
+                    `;
+                }
+            }, 300);
+            
+            console.log('🗑️ Yüklenen dosya silindi');
+        }
+
+        // Delete all recordings
+        function deleteAllRecordings() {
+            localStorage.removeItem('fonix_recordings');
+            
+            const recordingsList = document.getElementById('recordingsList');
+            recordingsList.innerHTML = `
+                <div class="empty-state" style="padding: 20px; text-align: center; color: #666;">
+                    <p>Henüz kayıt yok.</p>
+                    <p style="font-size: 12px; margin-top: 8px;">Stüdyo'da kayıt yapın veya dosya yükleyin.</p>
+                </div>
+            `;
+            
+            console.log('🗑️ Tüm kayıtlar silindi');
+        }
+
+        // Initialize
+        window.addEventListener('load', () => {
+            loadSavedRecordings();
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' && !e.target.matches('input, textarea')) {
+                e.preventDefault();
+                togglePlayback();
+            }
+        });
+    </script>
+</body>
+
+</html>
