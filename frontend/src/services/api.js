@@ -1,7 +1,7 @@
 import axios from 'axios'
 
-// Proxy kullan - Vite dev server üzerinden backend'e bağlan
-const API_URL = ''
+// Local'de proxy üzerinden, production'da VITE_API_URL env değişkeni
+const API_URL = import.meta.env.VITE_API_URL || ''
 
 const api = axios.create({
   baseURL: API_URL,

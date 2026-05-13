@@ -21,6 +21,12 @@ frontend_log.txt
 .env
 .env.local
 .env.production
+frontend/.env
+frontend/.env.local
+frontend/.env.production
+
+# Python sanal ortam
+venv/
 
 # Build çıktıları
 frontend/dist/

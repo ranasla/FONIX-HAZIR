@@ -125,7 +125,8 @@ const KaraokeRoom = () => {
     }
 
     const connectSocket = () => {
-        socketRef.current = io('http://localhost:5000', { transports: ['websocket', 'polling'] })
+        const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+        socketRef.current = io(backendUrl, { transports: ['websocket', 'polling'] })
 
         socketRef.current.on('connect', () => {
             socketRef.current.emit('join_room', { room_code: roomCode, user_id: user?.id, username: user?.username })
