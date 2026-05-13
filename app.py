@@ -26,7 +26,11 @@ CORS(app, resources={r"/api/*": {"origins": "*", "methods": ["GET", "POST", "PUT
 app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days=30)
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.join(BASE_DIR, "fonix.db")
+# Vercel serverless ortamında /tmp kullan, yoksa proje klasörü
+if os.environ.get('VERCEL'):
+    DB_PATH = '/tmp/fonix.db'
+else:
+    DB_PATH = os.path.join(BASE_DIR, "fonix.db")
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + DB_PATH
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
